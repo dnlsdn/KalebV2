@@ -94,3 +94,7 @@ Using Arduino UNO is the safest method for initial calibration, avoiding risks a
 - Servo reaches reference angles without jitter → **Pass**  
 - Horn installs without preload torque → **Pass**  
 - Arduino 5V rail remains stable → **Pass**
+
+---
+
+![IMG_9989](https://github.com/user-attachments/assets/31a7aadd-2138-424d-9368-c3dd84c3cdf8)
