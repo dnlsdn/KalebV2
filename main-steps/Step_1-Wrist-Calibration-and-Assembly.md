@@ -1,4 +1,4 @@
-## STEP 1 — Wrist Servo Calibration (0° / 180°) and Mechanical Assembly
+## Step 1 — Wrist Servo Calibration (0° / 180°) and Mechanical Assembly
 
 ### Objective
 
@@ -142,3 +142,7 @@ Correct servo alignment here prevents significant mechanical and software issues
 - Correct servo orientation assignment (0° left, 180° right) → **Pass**  
 - Bearing pins smooth and wrist structure rigid → **Pass**  
 - Servos centered without jitter → **Pass**
+
+---
+
+![IMG_9993](https://github.com/user-attachments/assets/0fbaf0f4-f4d7-4a2a-a7fd-d72fed5aa62c)
