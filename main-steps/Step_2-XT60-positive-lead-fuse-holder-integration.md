@@ -1,4 +1,4 @@
-## Step 3 — XT60 Positive Lead → Fuse Holder Integration (Power Safety Line)
+## Step 2 — XT60 Positive Lead → Fuse Holder Integration (Power Safety Line)
 
 ### Objective
 
