@@ -123,3 +123,7 @@ This prepares the system for the next steps involving the PCA9685, sensors, and 
 - No shorts across LM2596 output pins → **Pass**
 - Dupont connections firm and secure → **Pass**
 - ESP32 ready for I2C setup → **Pass**
+
+---
+
+![IMG_0145](https://github.com/user-attachments/assets/026c2768-6935-4d0f-b2d9-c18e2fa819bd)
