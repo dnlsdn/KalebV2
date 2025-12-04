@@ -1,0 +1,125 @@
+## Step 6 — ESP32 Power Integration (GND + 5V)
+
+### Objective
+
+Integrate the ESP32 DevKitC into the robot’s power architecture by:
+
+- Connecting its **ground** to the system’s **Punto Stella GND**
+- Supplying a stable, regulated **5.00V** from the LM2596 buck converter to the ESP32 5V pin
+
+This ensures a clean, noise-free reference and a safe, regulated power input for the microcontroller.
+
+
+
+---
+
+### Materials
+
+- ESP32 DevKitC
+- LM2596 buck converter (5V output already calibrated)
+- WAGO 5-pole connector (ground star point)
+- Dupont cables (female–female and male–female)
+- Multimeter (continuity test)
+- 24 AWG silicone wire (optional, not needed in this case)
+- Soldering iron (only for LM2596 OUT+ pin already prepared)
+
+
+
+---
+
+### Safety
+
+- **Do NOT connect the LiPo battery yet.**
+- Ensure LM2596 is still outputting **5.00V** before connecting the ESP32.
+- Avoid connecting VIN and 5V simultaneously on the ESP32.
+- Verify continuity after each connection (GND first, then 5V).
+- GND must always be connected **before** 5V to prevent floating logic levels.
+
+
+
+---
+
+# L1 — ESP32 GND → Punto Stella WAGO
+
+### Procedure
+
+1. Identify one of the ESP32 **GND** pins (recommended: the GND next to the 5V pin).
+2. Use a **dupont maschio–femmina** cable:
+   - **Femmina** → ESP32 GND pin
+   - **Maschio** → directly into an empty WAGO slot
+3. Insert the male dupont pin into the WAGO and close the lever.
+4. Pull gently to verify retention.
+
+### Test (continuity)
+
+Multimeter in **buzzer mode**:
+
+- Red probe → XT60 negative (battery ground)
+- Black probe → ESP32 GND pin
+
+**Expected:** 🔔 **BEEP**
+
+### Result
+
+ESP32 ground is now bonded to the system ground, ensuring stable operation and valid reference for all sensors.
+
+
+
+---
+
+# L2 — ESP32 5V → LM2596 OUT+
+
+### Procedure
+
+1. The LM2596 OUT+ pin already has a soldered male header.
+2. Use a **dupont femmina–femmina** cable:
+   - One side → LM2596 **OUT+** pin
+   - Other side → ESP32 **5V** pin
+3. Ensure both female ends are firmly seated on their respective pins.
+
+### Test (continuity)
+
+Multimeter in **buzzer mode**:
+
+- Red probe → LM2596 OUT+ pin
+- Black probe → ESP32 5V pin (metal portion)
+
+**Expected:** 🔔 **BEEP**
+
+### Result
+
+A clean, regulated 5.00V supply now powers the ESP32 safely and directly.
+
+
+
+---
+
+### Final Results
+
+- ESP32 GND connected to the **Punto Stella GND** via WAGO  
+- ESP32 powered through a **stable 5V rail** from the LM2596  
+- All continuity tests passed  
+- No exposed copper or loose wires  
+- ESP32 now ready for **I²C bus wiring** (PCA9685, MPU6050, OLED, sensors)
+
+---
+
+### Interpretation
+
+These two steps complete the “core power integration” for the ESP32:
+
+- GND ensures a unified reference for all logic
+- 5V ensures safe, stable operation under load
+- The ESP32 is now part of the robot’s electrical architecture
+
+This prepares the system for the next steps involving the PCA9685, sensors, and communication buses.
+
+---
+
+### Acceptance Criteria
+
+- ESP32 GND → WAGO shows continuity → **Pass**
+- ESP32 5V → LM2596 OUT+ shows continuity → **Pass**
+- No shorts across LM2596 output pins → **Pass**
+- Dupont connections firm and secure → **Pass**
+- ESP32 ready for I2C setup → **Pass**
