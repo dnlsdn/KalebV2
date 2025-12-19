@@ -1,11 +1,11 @@
 This repository documents my personal journey building a **SpotMicro-style quadruped robot** using the excellent open-source work available at:
 
-🔗 **SpotMicroESP32 by michaelkubina**  
+**SpotMicroESP32 by michaelkubina**  
 https://github.com/michaelkubina/SpotMicroESP32/
 
 ---
 
-## 📘 About Me
+## About Me
 
 I am a Master's student in **Computer Engineering – Cybersecurity curriculum** at Roma Tre University (Italy).  
 Robotics and electronics are not my main field of study — they are simply a **passion project** I pursue in my spare time.
@@ -15,7 +15,7 @@ Because of this, many of the steps in this repository may seem basic or overly d
 
 ---
 
-## 📝 Purpose of This Repository
+## Purpose of This Repository
 
 This project serves as:
 
@@ -30,7 +30,7 @@ Most steps include photos or illustrations.
 
 ---
 
-## 💬 Contact & Feedback
+## Contact & Feedback
 
 I’m happy to receive:
 
@@ -44,7 +44,7 @@ If something is unclear or you want more information about a specific step, feel
 
 ---
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 This is a hobby project.  
 I am learning robotics and electronics as I go, so expect simple explanations, incremental learning, and occasional mistakes.  
@@ -52,6 +52,6 @@ Everything I publish here is meant to help other beginners who want to start a s
 
 ---
 
-## 🔧 Acknowledgements
+## Acknowledgements
 
 A huge thank you to the creators and contributors of the original **SpotMicroESP32** project, whose work inspired this entire repository.
