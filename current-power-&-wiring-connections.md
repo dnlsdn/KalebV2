@@ -72,7 +72,7 @@ All grounds marked as **GND star** refer to a **single common star-ground point*
 | SCL | ESP32 GPIO22 |
 | SDA | ESP32 GPIO21 |
 | VCC | 3V3 |
-| V+ | Relay terminal |
+| V+ | null |
 
 ---
 
