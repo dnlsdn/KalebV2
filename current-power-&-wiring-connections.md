@@ -43,7 +43,7 @@ All grounds marked as **GND star** refer to a **single common star-ground point*
 
 | Pin / Terminal | Connected To |
 |---------------|-------------|
-| Terminal | PCA9685 V+ |
+| Terminal | 6V star |
 | Terminal | SZBK07 OUT+ |
 | IN | ESP32 GPIO25 |
 | GND | GND star |
