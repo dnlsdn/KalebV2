@@ -105,3 +105,7 @@ After reinforcement, the servo power rail is now:
 | No connector heating | Pass |
 | Stable 6.0 V under load | Pass |
 | Relay-controlled power maintained | Pass |
+
+---
+
+<img width="504" height="631" alt="image" src="https://github.com/user-attachments/assets/3c5e80f6-1c5e-46cb-92de-8529854ecd31" />
