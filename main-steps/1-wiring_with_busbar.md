@@ -25,3 +25,6 @@ I used AWG14 for the power path and Dupont cables for all logic connections.
 ## Current state
 
 Power path and 5V logic rail are fully wired and verified. The 6V servo rail via relay, the I2C bus, signal pins, and servo connections are all still to be done in the next sessions.
+
+<img width="4284" height="5712" alt="IMG_2362 (1) (2)" src="https://github.com/user-attachments/assets/966373b7-5cba-4eac-9991-6433acc4fc06" />
+
