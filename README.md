@@ -28,6 +28,8 @@ This project serves as:
 Each step is documented inside the `main-steps/` directory.  
 Most steps include photos or illustrations.
 
+For the current state of the build and what comes next, see [STATE.md](STATE.md).
+
 ---
 
 ## Contact & Feedback

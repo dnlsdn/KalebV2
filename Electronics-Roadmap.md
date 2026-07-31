@@ -65,7 +65,7 @@ Contains:
 | ------------------------- | ---- |
 | I2C SDA                   | 21   |
 | I2C SCL                   | 22   |
-| Servo Relay               | 5    |
+| Servo Relay               | 25   |
 | WS2812 DATA               | 23   |
 | HC-SR04 #1 TRIG           | 13   |
 | HC-SR04 #1 ECHO (divider) | 26   |
@@ -115,7 +115,11 @@ Contains:
 
 * SZBK07 OUT+ → Relay COM
 * Relay NO → 6V to PCA9685
-* Relay IN → GPIO 5
+* Relay IN → GPIO 25
+* The relay module is active-low: LOW turns it on, HIGH turns it off. Before `setup()` runs the pin
+  is not driven by anything, so add a 10k pull-up from that pin to 3.3V to keep the relay off
+  through boot and reset. Without it the servo rail can close for a few milliseconds at power-up,
+  while the PCA9685 has not been given any command yet.
 
 ---
 
@@ -144,12 +148,16 @@ Contains:
 ### Divider:
 
 ```
-ECHO → 2kΩ → node → GPIO
+ECHO → 1kΩ → node → GPIO
              |
-            1kΩ
+            2kΩ
              |
             GND
 ```
+
+The series resistor is the 1kΩ and the 2kΩ goes to ground, so the node sits at 5 × 2/3 = 3.33V.
+Swapping the two gives 1.67V, which is below the roughly 2.5V the ESP32 needs to read a pin as
+high, and the sensor either misbehaves or never triggers.
 
 ---
 
@@ -212,7 +220,7 @@ ECHO → 2kΩ → node → GPIO
         3V3  ───│• 3V3               VIN •│── 5V
         GND  ───│• GND               GND •│── GND
         21   ───│• SDA               23  •│── WS2812
-        22   ───│• SCL               5   •│── RELAY
+        22   ───│• SCL               25  •│── RELAY
         13   ───│• TRIG1             14  •│── TRIG2
         26   ───│• ECHO1             27  •│── ECHO2
         18   ───│• BUTTON            19  •│── LED BUTTON
