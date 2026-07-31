@@ -31,6 +31,34 @@ measurements took. With the logic powered, the 5V rail reads 4.98V at the bus ba
 output reads 6.00V, and the voltage after the fuse reads 7.55V, exactly the pack voltage. Then I
 pulled the fuse and disconnected the battery.
 
+## The verified power tree
+
+Everything in green was measured in this session. Everything in grey exists on paper only.
+
+```mermaid
+flowchart TD
+    BAT["LiPo 2S<br/>7.55 V"]:::ok --> FUSE["10 A fuse"]:::ok
+    FUSE --> ACS["ACS712"]:::ok
+    ACS --> LM["LM2596<br/>4.98 V out"]:::ok
+    ACS --> SZ["SZBK07<br/>6.00 V out, no load"]:::ok
+    SZ -.-> TODO["Relay, PCA9685 V+, 12 servos<br/>not wired yet"]:::todo
+    LM --> RED["Red bus bar<br/>5 V logic"]:::ok
+    RED --> ESP["ESP32 VIN"]:::ok
+    RED --> PCA["PCA9685 VCC"]:::ok
+    RED --> RLY["Relay VCC"]:::ok
+    RED --> CUR["ACS712 VCC"]:::ok
+    RED --> US1["HC-SR04 1 VCC"]:::ok
+    RED --> US2["HC-SR04 2 VCC"]:::ok
+    ESP --> GND["Black bus bar<br/>ground star"]:::ok
+    PCA --> GND
+    RLY --> GND
+    CUR --> GND
+    US1 --> GND
+    US2 --> GND
+    classDef ok fill:#1f6f43,stroke:#2ecc71,color:#eafff2;
+    classDef todo fill:#3a3f4b,stroke:#7f8c99,color:#dfe6ee;
+```
+
 ## What I found out
 
 **The SZBK07 heatsink is live.** The two metal bars on the sides of the converter beep against the
@@ -51,6 +79,15 @@ one third of 5V, so 1.67V. The ESP32 needs around 2.5V before it reads a pin as 
 circuit would have produced sensors that behave erratically or never trigger at all. The series
 resistor has to be the 1kΩ and the 2kΩ goes from the node to ground, giving 3.33V. Found on paper
 before any resistor was soldered.
+
+```mermaid
+flowchart LR
+    ECHO["HC-SR04 ECHO<br/>5 V"] --> R1["1 kΩ"]
+    R1 --> NODE(("node<br/>3.33 V"))
+    NODE --> GPIO["ESP32 GPIO<br/>reads high above ~2.5 V"]
+    NODE --> R2["2 kΩ"]
+    R2 --> GND["ground"]
+```
 
 **The 5V rail reads 4.98V, not the 5.00V it was trimmed to.** That is the logic drawing current:
 the regulator was set with nothing attached to it. Two tens of a percent is well inside what the
