@@ -108,3 +108,5 @@ PCA9685 V+ pin is still deliberately disconnected.
 Next session is the 6V servo rail and the relay: SZBK07 OUT+ to relay COM, relay NO to PCA9685 V+,
 the 1000µF capacitor, and the relay control wire to GPIO27 with its 10k pull-up. End state is a
 servo rail that can be switched on and off on command, with still no servo attached to it.
+
+<img width="1010" height="1238" alt="image" src="https://github.com/user-attachments/assets/48f90ad1-9960-4062-8b62-a6b322f4a53a" />
