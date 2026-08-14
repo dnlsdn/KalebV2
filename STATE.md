@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-08-14, session 3.
+**Last updated:** 2026-08-14, session 4.
 
 ---
 
@@ -85,23 +85,32 @@ not remembered. The pin by pin map is in `current-power-&-wiring-connections.md`
   the fuse, the same as the pack, so the fuse conducts and drops nothing.
 - ACS712 output split to both step-downs. The 5V rail reads 4.98V with the logic drawing current,
   the 6V rail reads 6.00V with nothing drawing from it.
-- Red bus bar feeds ESP32 VIN, PCA9685 VCC, relay VCC, ACS712 VCC and both HC-SR04 VCC. All six
-  grounds are on the black bus bar. No short between the two bars.
+- Red bus bar feeds ESP32 VIN, relay VCC, ACS712 VCC and both HC-SR04 VCC. All grounds are on the
+  black bus bar. No short between the two bars.
 - AWG14 for the power path, Dupont for logic.
 - **The SZBK07 heatsink bars sit at battery potential.** They are tied to the positive input and
   isolated from ground.
+- **The red bus bar is live at 4.93V whenever the ESP32 is on USB**, battery or no battery: USB
+  power back-feeds out of the VIN pin onto the bar. Measured in session 4. "Battery disconnected"
+  does not mean "nothing is powered".
 
-**The power path is finished and verified.** What remains is almost entirely signal wiring: Dupont
-wire, no current, no electrical risk.
+**The I2C bus works.** Built and verified in session 4: PCA9685 answers at 0x40 and MPU6050 at
+0x68. The PCA9685 was moved off the 5V bar onto the ESP32's 3V3 pin, because its 10k I2C pull-ups
+tie to VCC and would otherwise have idled SDA and SCL at 5V, above the ESP32's 3.6V maximum. 3.3V
+and the two I2C lines are distributed with WAGO connectors.
+
+**The power path is finished and verified.** What remains on the signal side is the relay control
+wire and the twelve servo channels.
 
 **Battery.** Healthy. Cells at 3.78V each, perfectly balanced, pack at 7.55V. About half charge, so
 it needs a top-up before any test that actually drives the servos.
 
 **Not wired yet:** the 6V servo rail (PCA9685 V+ is deliberately disconnected — the servos have
-never been powered), the relay control pin, the I2C bus, all signal pins, the twelve servos. The
-MPU6050 and the voltage sensor are not mounted at all.
+never been powered), the relay control pin, the twelve servos. The voltage sensor is not mounted at
+all.
 
-**Firmware.** Nothing. No sketch has ever been flashed on this build.
+**Firmware.** An I2C scanner was flashed in session 4, the first code ever run on this build.
+Nothing else.
 
 ---
 
@@ -125,39 +134,39 @@ not by a document.
 
 ---
 
-## Next session — Session 4: I2C bus and the first sketch
+## Next session — Session 5: the 6V servo rail and the relay
 
-The safest session in the whole project and the first time the board does anything.
+The first session that puts real current somewhere new, so the pack stays disconnected and the fuse
+stays out for the whole build, and it only goes back in at the end for the measurement.
 
-Battery disconnected and fuse out. The ESP32 is powered from the computer's USB, nothing else is
-energised, and no servo can move because the 6V rail still goes nowhere.
+Parts confirmed in the drawer on 2026-08-14: 1000µF capacitor, 10k resistor, AWG14 offcuts.
 
-- [ ] Move PCA9685 VCC from the red bus bar to the ESP32 3V3 pin. **Check first whether the board
-      has I2C pull-up resistors to VCC** — many do. With VCC at 5V those pull-ups would put 5V on
-      GPIO21 and GPIO22. At 3.3V the whole bus is clean and no level shifting is needed anywhere.
-- [ ] SDA to GPIO21, SCL to GPIO22, on both the PCA9685 and the MPU6050.
-- [ ] PCA9685 OE to the black bus bar.
-- [ ] MPU6050 power on 3.3V, ground on the black bus bar.
-- [ ] Flash nothing but an I2C scanner, in the Arduino IDE. Servos disconnected, no other code.
-- [ ] Expected: PCA9685 answers at **0x40**, MPU6050 at 0x68 or 0x69.
-- [ ] Update `current-power-&-wiring-connections.md`, write `main-steps/4-i2c-bus.md`, update this
-      file, one commit.
+- [ ] SZBK07 OUT+ to relay COM. **AWG14, never Dupont** — twelve MG996R under load pull several
+      amps.
+- [ ] Relay NO to PCA9685 V+. AWG14.
+- [ ] 1000µF close to the PCA9685, watching polarity. It is the local charge reservoir for the
+      servo current spikes.
+- [ ] Relay IN to GPIO27, plus a **10k pull-up from that pin to 3.3V**. The module is active-low
+      and the pin is undriven until `setup()` runs; without the pull-up the servo rail can close
+      for a few milliseconds at power-up, before the PCA9685 has been told anything.
+- [ ] Flash the sketch in `relay-off-on-safe.md` before anything else, so the pin is explicitly
+      driven high.
+- [ ] Verify with the multimeter, relay OFF: PCA9685 V+ reads 0V. Then command it on and confirm
+      the rail reaches 6V. **No servo connected for either measurement.**
+- [ ] Update `current-power-&-wiring-connections.md`, write `main-steps/5-servo-rail.md`, update
+      this file, one commit.
 
 ---
 
 ## Backlog — ordered, one per session, never two in the same evening
 
-1. **6V servo rail.** SZBK07 OUT+ to relay COM, relay NO to PCA9685 V+, 1000µF close to the
-   PCA9685, relay control wire to GPIO27 plus a 10k pull-up to 3.3V so the relay stays off through
-   boot. AWG14 on this rail, never Dupont: twelve MG996R under load pull several amps. Relay OFF by
-   default. End state: the 6V rail can be switched on and off on command, with **no servo connected
-   yet**. Parts confirmed in the drawer on 2026-08-14.
-2. **One single servo.** Centered at 1500µs. One, not twelve.
-3. **The remaining eleven servos**, on michaelkubina's channel map: front left 0/1/2, front right
-   3/4/5, rear left 6/7/8, rear right 9/10/11, in the order shoulder, upper leg, lower leg.
-4. **Leika: build and flash.** PlatformIO, submodules, filesystem image. Calibrate all twelve
+1. **One single servo.** Centered at 1500µs. One, not twelve.
+2. **The remaining eleven servos**, on michaelkubina's channel map: front left 0/1/2, front right
+   3/4/5, rear left 6/7/8, rear right 9/10/11, in the order shoulder, upper leg, lower leg. Waits
+   on the replacement servos, estimated 23-28 August.
+3. **Leika: build and flash.** PlatformIO, submodules, filesystem image. Calibrate all twelve
    channels.
-5. **Legs onto the chassis, first steps.**
+4. **Legs onto the chassis, first steps.**
 
 **After it walks:** MPU6050 tuning, ACS712 output to GPIO34, voltage sensor, HC-SR04 with the
 dividers, ESP32-CAM, OLED.
@@ -169,14 +178,21 @@ Before the robot ever walks, the Dupont connections have to be secured. They hol
 and vibration works them loose, which shows up as a firmware bug that is not a firmware bug. Hot
 glue on the housings or crimped connectors.
 
+**The same applies to Dupont wire inside the WAGO connectors, and it has already bitten once.**
+WAGO 221 is specified from 0.14mm² and Dupont is about 0.08mm², below the minimum the lever can
+grip. In session 4 one SDA wire sat in the connector without making contact and was only caught by
+a continuity check before power. Strip longer and fold the conductor back on itself, and tug-test
+every wire after closing the lever.
+
 ---
 
 ## Open questions — answer before they cost something
 
-- **Why did the two servos fail?** Worth answering before all twelve carry the robot's weight. If
-  they arrived faulty, or were stripped by forcing a joint by hand, nothing follows from it. If they
-  failed under mechanical load in an assembled leg, that is a signal about whether the MG996R is
-  enough for this build — Leika recommends 20-36 kg servos and suggests going above the MG996R.
+- **Why did the two servos fail?** Probably overloaded during testing on the old wiring, the one
+  scrapped in April for having known electrical mistakes. Treated as a one-off from a configuration
+  that no longer exists, not as evidence that the MG996R is too small. Re-open this if more of them
+  fail once the robot actually carries its own weight — Leika recommends 20-36 kg servos and
+  suggests going above the MG996R.
 - **The replacement servos are not centered.** They must be driven to 1500µs before their horns go
   on, like the other ten. That needs a working PCA9685, so it cannot happen before backlog item 2.
 - **Is the relay module's contact rating enough?** A typical 5V relay module is rated 10A DC. Twelve
