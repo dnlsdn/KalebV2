@@ -149,8 +149,7 @@ Parts confirmed in the drawer on 2026-08-14: 1000µF capacitor, 10k resistor, AW
 - [ ] Relay IN to GPIO27, plus a **10k pull-up from that pin to 3.3V**. The module is active-low
       and the pin is undriven until `setup()` runs; without the pull-up the servo rail can close
       for a few milliseconds at power-up, before the PCA9685 has been told anything.
-- [ ] Flash the sketch in `relay-off-on-safe.md` before anything else, so the pin is explicitly
-      driven high.
+- [ ] Flash `code/relay_off_on_safe` before anything else, so the pin is explicitly driven high.
 - [ ] Verify with the multimeter, relay OFF: PCA9685 V+ reads 0V. Then command it on and confirm
       the rail reaches 6V. **No servo connected for either measurement.**
 - [ ] Update `current-power-&-wiring-connections.md`, write `main-steps/5-servo-rail.md`, update

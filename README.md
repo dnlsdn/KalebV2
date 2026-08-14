@@ -28,7 +28,23 @@ This project serves as:
 Each step is documented inside the `main-steps/` directory.  
 Most steps include photos or illustrations.
 
+Test sketches live in [`code/`](code/) — small programs that each check one thing, so a fault can be
+traced to the wiring or to the software without guessing.
+
 For the current state of the build and what comes next, see [STATE.md](STATE.md).
+
+---
+
+## A note on the firmware
+
+The reference project above is a **mechanical and electrical design** and states that it has no
+programming part. Wiring this robot exactly as documented produces a machine that cannot move, and
+it took me three sessions to notice.
+
+The firmware I am targeting is [SpotMicroESP32-Leika by
+runeharlyk](https://github.com/runeharlyk/SpotMicroESP32-Leika), one of the community forks the
+reference project recommends. If you are following the same path, decide this early: the firmware
+dictates the pinout, so choosing it after the wiring means doing the wiring twice.
 
 ---
 
