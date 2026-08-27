@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-08-14, session 4.
+**Last updated:** 2026-08-27, session 5.
 
 ---
 
@@ -45,6 +45,13 @@ built around — L1 shoulder 10mm, L2 upper leg 60.5mm, L3 lower leg 111.1mm, L4
 Leika itself is flashed — it is a submodule project with a filesystem image and a Svelte web app,
 and it does not build in the Arduino IDE.
 
+**Leika contains no relay** — checked in session 5, across its code and its component list, which
+specifies a manual main power switch instead. So when Leika is flashed, nothing will drive the servo
+rail control pin and the servos will never be powered. The fix is a two-line addition to Leika's
+setup, or a link in place of the relay, and it belongs to the session where Leika is flashed. Leika
+does confirm SDA 21 / SCL 22, matching this build, and it has an `[env:esp32dev]` target, so a plain
+ESP32 is supported.
+
 ---
 
 ## Scope — what is on the path to walking
@@ -71,11 +78,11 @@ session, ahead of the entire servo chain, for a subsystem whose firmware is not 
 were centered at 1500µs before their horns were mounted, so nothing has to be taken apart. Chassis
 is printing.
 
-**Two servos failed** — broken or misbehaving — and are being replaced. Four MG996R-180 were
-ordered on 2026-08-14 from the same AliExpress listing and store the original twelve came from
-(Kevixun Store), so the replacements are identical to the ten already on the legs: two for the
-robot, two as spares. Estimated delivery 23-28 August. Nothing on the bench waits for them until
-the twelve-servo session.
+**Two servos failed** — broken or misbehaving — and were replaced. Four MG996R-180 were ordered on
+2026-08-14 from the same AliExpress listing and store the original twelve came from (Kevixun Store),
+so the replacements are identical to the ten already on the legs: two for the robot, two as spares.
+**They arrived on 2026-08-27** and are on the bench. They are still not centred at 1500µs, and
+cannot be until the servo rail can be commanded.
 
 **Electronics.** The old wiring was scrapped on 2026-04-12 and rebuilt around two bus bars: black
 for the ground star, red for the 5V logic rail. Every connection below was measured on 2026-07-31,
@@ -99,18 +106,53 @@ not remembered. The pin by pin map is in `current-power-&-wiring-connections.md`
 tie to VCC and would otherwise have idled SDA and SCL at 5V, above the ESP32's 3.6V maximum. 3.3V
 and the two I2C lines are distributed with WAGO connectors.
 
-**The power path is finished and verified.** What remains on the signal side is the relay control
-wire and the twelve servo channels.
+**The 6V servo rail is built and verified** — session 5. SZBK07 OUT+ to relay COM in AWG14; relay NO
+to PCA9685 V+ in **AWG16**, because the board's green screw terminal is a 3.5mm block rated to
+1.5mm² and AWG14 does not fit it by design; and a new **AWG16 ground return** from the PCA9685's GND
+screw to the black bus bar, which the session plan had omitted entirely — the old Dupont there was
+sized for logic current and would have carried the return of twelve MG996R.
+
+Measured with the pack connected and USB unplugged: SZBK07 OUT+ at **6.0V**, PCA9685 V+ at **0V**
+with the relay open, and **6.0V** with the relay closed by hand. No servo was connected. The rail
+exists and the relay genuinely isolates it.
+
+**No external capacitor was added.** This PCA9685 already carries a **1000µF 10V** on the servo
+rail, verified by continuity against both screws. A second one would only enlarge the inrush the
+relay contacts see at closing. The spare 1000µF 16V is kept as a documented remedy if the rail
+collapses on peaks later, to be fitted **before the relay**, on the SZBK07 output.
+
+**What remains on the signal side is the relay control, and the twelve servo channels.**
 
 **Battery.** Healthy. Cells at 3.78V each, perfectly balanced, pack at 7.55V. About half charge, so
 it needs a top-up before any test that actually drives the servos.
 
-**Not wired yet:** the 6V servo rail (PCA9685 V+ is deliberately disconnected — the servos have
-never been powered), the relay control pin, the twelve servos. The voltage sensor is not mounted at
-all.
+**The relay cannot be commanded from GPIO27 directly.** Found in session 5 and it is the finding that
+matters most. The module is an SRD-05VDC-SL-C whose IN pin is the base of a **PNP transistor with its
+emitter on VCC**: floating, IN sits at 4.2V, which is 4.93V minus exactly one base-emitter drop, and
+an ohmmeter finds no resistive path between IN and VCC because there is a junction there and not a
+resistor. The relay is open only while **IN stays above roughly 4.2V**.
 
-**Firmware.** An I2C scanner was flashed in session 4, the first code ever run on this build.
-Nothing else.
+An ESP32 pin can never do that. Driven high it reaches 3.3V — 3.1V measured on this board. Left in
+high impedance it is clamped by its own protection diode near 3.9V. Both are below the threshold, so
+**no state of the software holds this relay open** with GPIO27 wired to IN. Wired that way, the relay
+closed and stayed closed. The pin and the sketch were both correct.
+
+The planned 10k pull-up to 3.3V was **not installed and would not have helped**: GPIO27 and IN are one
+node, so it would have pulled the same wire in the same direction, and to 3.3V rather than the 4.2V
+the module needs. The related worry about 4.2V reaching GPIO27 during boot, over the ESP32's 3.6V
+maximum, is closed by the same measurements — the source impedance is of the order of kilohms and the
+clamp current is around a tenth of a milliamp for the length of a boot. **No series resistor needed.**
+
+**Not wired yet:** the relay control (see next session), the twelve servos. The voltage sensor is not
+mounted at all.
+
+**The black bus bar has one free position.** The only thing still queued for it is the battery
+voltage sensor, after the robot walks. A WAGO tapped off the bar, or a second bar, solves it when the
+time comes.
+
+**Firmware.** An I2C scanner in session 4, and `relay_off_on_safe` flashed in session 5. That sketch
+is now **wrong for the hardware** and has to be rewritten once the transistor stage exists, because
+the sense of the pin inverts.
 
 ---
 
@@ -134,25 +176,35 @@ not by a document.
 
 ---
 
-## Next session — Session 5: the 6V servo rail and the relay
+## Next session — Session 6: the transistor stage on the relay control
 
-The first session that puts real current somewhere new, so the pack stays disconnected and the fuse
-stays out for the whole build, and it only goes back in at the end for the measurement.
+The only thing standing between this build and a servo that moves. The pack stays disconnected and
+the fuse stays out for the whole build; the stage can be tested entirely on USB, because it is
+verified by whether the relay clicks, not by what the rail does.
 
-Parts confirmed in the drawer on 2026-08-14: 1000µF capacitor, 10k resistor, AWG14 offcuts.
+Why a transistor and not a wire: the module's IN pin is a PNP base sitting at 4.2V, and the relay is
+open only while IN stays above that. No ESP32 output level reaches it. An NPN between GPIO27 and IN
+inverts the command and decouples the levels, and it makes the safe state the natural one — with the
+transistor off, IN is simply left alone at 4.2V and **the relay is open with no software involved.**
 
-- [ ] SZBK07 OUT+ to relay COM. **AWG14, never Dupont** — twelve MG996R under load pull several
-      amps.
-- [ ] Relay NO to PCA9685 V+. AWG14.
-- [ ] 1000µF close to the PCA9685, watching polarity. It is the local charge reservoir for the
-      servo current spikes.
-- [ ] Relay IN to GPIO27, plus a **10k pull-up from that pin to 3.3V**. The module is active-low
-      and the pin is undriven until `setup()` runs; without the pull-up the servo rail can close
-      for a few milliseconds at power-up, before the PCA9685 has been told anything.
-- [ ] Flash `code/relay_off_on_safe` before anything else, so the pin is explicitly driven high.
-- [ ] Verify with the multimeter, relay OFF: PCA9685 V+ reads 0V. Then command it on and confirm
-      the rail reaches 6V. **No servo connected for either measurement.**
-- [ ] Update `current-power-&-wiring-connections.md`, write `main-steps/5-servo-rail.md`, update
+The stage: GPIO27 through a **1k base resistor** to the base of a small NPN (2N2222, BC547, S8050 or
+equivalent); **10k from base to ground** so the base cannot float while GPIO27 is undriven at boot;
+**collector to the relay's IN pin**; **emitter to the black bus bar**. Confirm the parts are in the
+drawer before starting — if there is no NPN on the bench, the alternative is an optocoupled relay
+module with a separate JD-VCC jumper, which is a part to order.
+
+- [ ] Confirm an NPN, a 1k and a 10k are on the bench.
+- [ ] Build the stage. Emitter to the black bus bar, which has one free position left.
+- [ ] Rewrite `code/relay_off_on_safe`: **the sense inverts.** GPIO27 LOW is now relay OFF, and
+      that is also what an undriven pin gives, so the safe state costs nothing. Flash it before
+      connecting the collector to IN.
+- [ ] Write a second sketch that closes the rail on a serial command, so the relay can be commanded
+      on deliberately rather than by touching a wire to ground.
+- [ ] Verify on USB alone, no pack: relay silent with GPIO27 low, and it clicks on command. Then
+      press EN and confirm it does not click during the reset — that is the boot window.
+- [ ] Only then, pack in: PCA9685 V+ reads 0V with the rail off and 6.0V with it on, **no servo
+      connected.**
+- [ ] Update `current-power-&-wiring-connections.md`, write `main-steps/6-relay-control.md`, update
       this file, one commit.
 
 ---
@@ -161,11 +213,15 @@ Parts confirmed in the drawer on 2026-08-14: 1000µF capacitor, 10k resistor, AW
 
 1. **One single servo.** Centered at 1500µs. One, not twelve.
 2. **The remaining eleven servos**, on michaelkubina's channel map: front left 0/1/2, front right
-   3/4/5, rear left 6/7/8, rear right 9/10/11, in the order shoulder, upper leg, lower leg. Waits
-   on the replacement servos, estimated 23-28 August.
-3. **Leika: build and flash.** PlatformIO, submodules, filesystem image. Calibrate all twelve
-   channels.
-4. **Legs onto the chassis, first steps.**
+   3/4/5, rear left 6/7/8, rear right 9/10/11, in the order shoulder, upper leg, lower leg. The
+   replacement servos arrived on 2026-08-27, so nothing waits on delivery any more.
+3. **Reinforce the PCA9685's V+ and GND traces with solder.** Leika's own documentation recommends
+   it, and those traces are the narrowest point of the whole servo power path — narrower than the
+   AWG16 feeding them. Before the robot carries its own weight.
+4. **Leika: build and flash.** PlatformIO, submodules, filesystem image. Calibrate all twelve
+   channels. **Leika has no relay support**: GPIO27 will never be driven, so the servo rail will
+   stay open until a two-line addition is made to its setup, or a link replaces the relay.
+5. **Legs onto the chassis, first steps.**
 
 **After it walks:** MPU6050 tuning, ACS712 output to GPIO34, voltage sensor, HC-SR04 with the
 dividers, ESP32-CAM, OLED.
@@ -194,11 +250,16 @@ every wire after closing the lever.
   suggests going above the MG996R.
 - **The replacement servos are not centered.** They must be driven to 1500µs before their horns go
   on, like the other ten. That needs a working PCA9685, so it cannot happen before backlog item 2.
-- **Is the relay module's contact rating enough?** A typical 5V relay module is rated 10A DC. Twelve
-  MG996R stalling together would be far more than that, though they never all stall at once. Worth
-  checking the module's own rating before the servo rail is closed under load.
-- **Does Leika expect the relay on GPIO27?** Read its configuration before flashing. If not, it is
-  one Dupont wire to move.
+- **Is the relay module's contact rating enough?** **Answered in session 5.** The module is an
+  SRD-05VDC-SL-C, printed 10A 250VAC / 10A 30VDC. On a 6V rail the margin is large and no part needs
+  changing. The rule that follows is about use, not rating: what kills relay contacts on DC is
+  breaking under load and capacitor inrush, so the relay is only ever switched with the servos idle.
+- **Does Leika expect the relay on GPIO27?** **Answered in session 5: it expects no relay at all.**
+  See the firmware section above.
+- **Will the NPN stage actually switch this module?** The base resistor value assumes an ordinary
+  small-signal NPN and a module whose input needs a few milliamps. If the relay does not pull in
+  cleanly with 1k, the next step is to measure the current the IN pin draws when grounded and size
+  the base resistor from that number rather than from a guess.
 
 ---
 
@@ -207,7 +268,11 @@ every wire after closing the lever.
 - The pack stays disconnected while anything on the power path is being changed.
 - The SZBK07 heatsink bars are live at battery potential. Nothing at ground touches them, no metal
   tool near them while powered, and they never get mounted against a conductive surface.
-- The relay stays OFF unless a servo test is actively running.
+- The relay stays OFF unless a servo test is actively running, and it is only ever switched with the
+  servos idle — never under load.
+- **No servo is connected until the relay can be commanded off and on deterministically.** Until the
+  transistor stage exists, the rail can only be closed by touching a wire to ground, which is not a
+  control.
 - No firmware touches the ultrasonic sensors until the ECHO dividers are in place.
 - Every voltage claim in a session log is a multimeter reading, not an assumption.
 
