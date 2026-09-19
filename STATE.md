@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-09-19, session 6.
+**Last updated:** 2026-09-19, session 7.
 
 ---
 
@@ -86,8 +86,8 @@ is printing.
 **Two servos failed** — broken or misbehaving — and were replaced. Four MG996R-180 were ordered on
 2026-08-14 from the same AliExpress listing and store the original twelve came from (Kevixun Store),
 so the replacements are identical to the ten already on the legs: two for the robot, two as spares.
-**They arrived on 2026-08-27** and are on the bench. They are still not centred at 1500µs, and
-have to be before their horns go on; the rail is live since session 6.
+**They arrived on 2026-08-27.** One was centred at 1500µs in session 7 and waits, horn off, for its
+leg; its shaft must not be turned by hand. The other is still to be centred.
 
 **Electronics.** The old wiring was scrapped on 2026-04-12 and rebuilt around two bus bars: black
 for the ground star, red for the 5V logic rail. Every connection below was measured on 2026-07-31,
@@ -124,15 +124,23 @@ pack now means live servos.**
 **No external capacitor.** This PCA9685 already carries a **1000µF 10V** on the servo rail. The spare
 1000µF 16V is kept as a remedy if the rail collapses on peaks, to be fitted on the SZBK07 output.
 
-**Battery.** Healthy at the last check: cells at 3.78V each, balanced, pack at 7.55V. About half
-charge, so it needs a top-up before session 7.
+**The first servo moved** — session 7. `code/servo_center` drove channel 0 to 1500µs and a
+replacement servo went to its centre and held. V+ stayed at **6.0V** and the red bar at **4.98V**
+while it held. The whole chain works under a real load.
+
+**Battery.** 7.55V, cells at 3.78V each and balanced, measured at the start of session 7. About half
+charge: enough for one servo, **charge it before several servos are powered together.**
+
+**USB and the pack never go in together** — Espressif's DevKitC guide, found in session 7. Flash on
+USB with the XT60 unplugged, then unplug USB before connecting the pack.
 
 **Bus bars.** Seven free positions on the red bar, two on the black bar since the relay's wires came
 off.
 
-**Not wired yet:** the twelve servos. The voltage sensor is not mounted at all.
+**Not wired yet:** the twelve servos on the robot; channel 0 holds the bench test servo. The voltage sensor is not mounted at all.
 
-**Firmware.** An I2C scanner in session 4, and `relay_off_on_safe` flashed in session 5. That sketch
+**Firmware.** An I2C scanner in session 4, `relay_off_on_safe` in session 5, `servo_center` in
+session 7 (Adafruit PWM Servo Driver Library 3.0.3). That sketch
 has no job since the relay was removed and stays in `code/` only as a record.
 
 ---
@@ -157,33 +165,28 @@ not by a document.
 
 ---
 
-## Next session — Session 7: one servo
+## Next session — Session 8: both replacement servos into their legs
 
-The first thing that moves. One servo, not twelve: it proves the whole chain — ESP32, I2C, PCA9685,
-6V rail — under a real load, and if something is wrong there is only one place to look.
+The two failed servos left two empty positions in the legs. Both replacements have to be centred
+before their horns go on, and one already is. This is a **mechanical session**: the only electrical
+step is centring the second servo with a sketch that already works, and it comes first.
 
-Use **one of the two replacement servos, horn off**. It has to be centred at 1500µs before its horn
-goes on anyway, so the first test does a real job.
+- [ ] Find and write down **which two positions** are empty: leg, and shoulder / upper leg / lower
+      leg. Not recorded anywhere yet.
+- [ ] Centre the second replacement: `servo_center` is already on the ESP32. Servo on channel 0,
+      XT60 in, it moves and holds, XT60 out. No USB needed.
+- [ ] Mount both servos in their positions and seat the horns **without turning the shafts**,
+      following michaelkubina's assembly guide for the horn angle.
+- [ ] Update this file and `current-power-&-wiring-connections.md`, write
+      `main-steps/8-replacement-servos.md`, one commit.
 
-- [ ] **Charge the pack** before the session, balance charge.
-- [ ] Write `code/servo_center`: PCA9685 at 0x40 on SDA 21 / SCL 22, 50Hz, channel 0 to 1500µs.
-      Flash it on USB with the **XT60 unplugged**: no servo power while flashing.
-- [ ] XT60 still unplugged: servo on **channel 0**, brown to GND, red to V+, orange to PWM.
-- [ ] Connect the XT60. The servo should move once to centre and hold.
-- [ ] Measure with the servo holding: PCA9685 V+ and the red bar. If the ESP32 resets when the servo
-      moves, that is the 5V rail dipping and it goes into "what is still open".
-- [ ] Update `current-power-&-wiring-connections.md` and `docs/wiring/`, write
-      `main-steps/7-one-servo.md`, update this file, one commit.
-
-The PCA9685's internal oscillator is only nominally 25MHz and varies from board to board, so
-"1500µs" in code can land some tens of microseconds off. It does not matter for centring a single
-servo, and Leika calibrates every channel later.
+Before session 9, when all twelve are connected: **charge the pack.**
 
 ---
 
 ## Backlog — ordered, one per session, never two in the same evening
 
-1. **The remaining eleven servos**, on michaelkubina's channel map: front left 0/1/2, front right
+1. **All twelve servos on the PCA9685**, on michaelkubina's channel map: front left 0/1/2, front right
    3/4/5, rear left 6/7/8, rear right 9/10/11, in the order shoulder, upper leg, lower leg. The
    replacement servos arrived on 2026-08-27, so nothing waits on delivery any more. An extension
    cable is on hand for every servo; the lower legs need them.
@@ -222,7 +225,7 @@ every wire after closing the lever.
   fail once the robot actually carries its own weight — Leika recommends 20-36 kg servos and
   suggests going above the MG996R.
 - **The replacement servos are not centered.** They must be driven to 1500µs before their horns go
-  on, like the other ten. The first one is centred in session 7, the second with the other eleven.
+  on, like the other ten. The first was centred in session 7, the second is session 8.
 - **The relay questions are closed.** The module could not be driven at 3.3V (session 5), Leika
   expects no relay at all, and the module was removed in session 6.
 - **Is the main switch rated for the servo current?** It will be the only servo power control. Read

@@ -76,7 +76,8 @@ def servos(view, pins):
     for name, ch in layout.SERVOS:
         x, y = layout.servo_xy(ch)
         s, p = L.servo(x, y, name, ch)
-        if view == "current":
+        bench = view == "current" and ch in layout.BENCH_SERVOS
+        if view == "current" and not bench:
             out.append(f'<g class="part ghost">{s}</g>')
             continue
         out.append(f'<g class="part">{s}</g>')
@@ -87,18 +88,21 @@ def servos(view, pins):
         for off, col in ((-2.6, "#6d4c41"), (0, "#e53935"), (2.6, "#ffb300")):
             my = (y0 + y1) / 2
             d = f"M{x0 + off:.1f} {y0}C{x0 + off:.1f} {my:.1f} {x1 + off:.1f} {my:.1f} {x1 + off:.1f} {y1}"
-            strands += f'<path d="{d}" fill="none" stroke="{col}" stroke-width="1.7" stroke-dasharray="12 5" opacity=".9"/>'
-        if lower:
+            dash = "" if bench else ' stroke-dasharray="12 5"'
+            strands += f'<path d="{d}" fill="none" stroke="{col}" stroke-width="1.7"{dash} opacity=".9"/>'
+        if lower and not bench:
             mx, my = x1, y1 - 16
             strands += f'<rect x="{mx - 7}" y="{my - 5}" width="14" height="10" rx="1.5" fill="#111" stroke="#bbb"/>'
         note = "Extension 10-15cm on the lower leg, as in michaelkubina and Leika." if lower else ""
-        m = dict(id=wid, frm=f"PCA9685 ch{ch}", to=f"{name} servo", net="servo", kind="servo lead, brown GND · red V+ · orange PWM",
-                 status="plan", note=(note + " Centre at 1500µs before the horn goes on.").strip())
+        m = dict(id=wid, frm=f"PCA9685 ch{ch}", to=layout.BENCH_SERVOS[ch] if bench else f"{name} servo", net="servo",
+                 kind="servo lead, brown GND · red V+ · orange PWM", status="ok" if bench else "plan",
+                 note=("Session 7: moved once to centre and held. V+ 6V and red bar 4.98V while holding." if bench
+                       else (note + " Centre at 1500µs before the horn goes on.").strip()))
         meta.append(m)
-        out.append(f'<g class="wire st-plan" data-id="{wid}" tabindex="0"><title>{escape(m["frm"] + " → " + m["to"])}</title>{strands}'
+        out.append(f'<g class="wire st-{m["status"]}" data-id="{wid}" tabindex="0"><title>{escape(m["frm"] + " → " + m["to"])}</title>{strands}'
                    f'<path class="hit" d="M{x0} {y0}C{x0} {(y0 + y1) / 2} {x1} {(y0 + y1) / 2} {x1} {y1}" fill="none" stroke="transparent" stroke-width="12"/></g>')
     if view == "current":
-        out.append(text(1395, 880, "12 × MG996R · not connected yet · 10 on the legs, 2 spares to centre", 10, cls="lbl"))
+        out.append(text(1395, 880, "ch0: test servo on the bench · the other 11 not connected yet", 10, cls="lbl"))
     out.append(text(1160, 628, "FRONT LEGS", 9, anchor="start", fill="#7f8f99", weight=700))
     out.append(text(1160, 748, "REAR LEGS", 9, anchor="start", fill="#7f8f99", weight=700))
     return out, meta

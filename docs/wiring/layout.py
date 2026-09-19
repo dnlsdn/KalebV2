@@ -44,3 +44,7 @@ def servo_xy(ch):
     """Two rows: front legs (ch0-5) and rear legs (ch6-11), each left to right in channel order."""
     row, col = divmod(ch, 6)
     return 1160 + col * 78, 650 + row * 120
+
+
+# Servos plugged in on the bench today, by channel. The rest are drawn ghosted in the current view.
+BENCH_SERVOS = {0: "replacement servo, horn off, centred at 1500us in session 7"}
