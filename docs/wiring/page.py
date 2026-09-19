@@ -151,7 +151,7 @@ def main():
   <aside>
     <div class="card detail"><h2>Selected wire</h2><div id="detail"></div></div>
     <div class="card"><h2>In this drawing</h2><div class="counts" id="counts"></div></div>
-    <div class="card"><h2>Read this first</h2><p class="note" style="margin:0">Power wires are drawn in the colours on the bench. Dupont colours are a convention for this drawing: 5V red, 3.3V violet, SDA yellow, SCL orange, signals blue, analog green. Screw positions on the bus bars are illustrative. In the complete robot the relay is bypassed with a COM–NO jumper: the main switch turns the servos on and off.</p></div>
+    <div class="card"><h2>Read this first</h2><p class="note" style="margin:0">Power wires are drawn in the colours on the bench. Dupont colours are a convention for this drawing: 5V red, 3.3V violet, SDA yellow, SCL orange, signals blue, analog green. Screw positions on the bus bars are illustrative. There is no relay: the servo rail is live whenever the pack is connected, and in the complete robot the main switch turns it on and off.</p></div>
   </aside>
 </div>
 <div class="tablewrap"><table><thead><tr><th>status</th><th>from</th><th>to</th><th>net</th><th>wire</th><th>notes</th></tr></thead><tbody id="rows"></tbody></table></div>

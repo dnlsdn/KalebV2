@@ -25,7 +25,7 @@ PLACEMENT = {
     "wsplit": (P.wago, 520, 560, (3, "split WAGO"), "both"),
     "lm": (P.lm2596, 660, 400, (), "both"),
     "sz": (P.szbk07, 660, 560, (), "both"),
-    "relay": (P.relay_pnp, 1000, 430, (), "both"),
+    "wrail": (P.wago, 1010, 500, (2, "servo rail WAGO"), "both"),
     "pca": (L.pca9685, 1150, 460, (), "both"),
     "gtap": (P.wago, 990, 952, (5, "future GND tap"), "final"),
     "black": (P.bus_bar, 620, 950, ("black", "BLACK BUS BAR · ground star"), "both"),

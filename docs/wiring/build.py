@@ -139,9 +139,8 @@ def render(view):
         meta.append(m)
         wire_out.append(wire_svg(d, wd["net"], wd["kind"], wd["status"], wd["id"], m))
     servo_out, smeta = servos(view, pins)
-    rl = ("relay module · blue, low-level trigger (PNP input)", "SRD-05VDC-SL-C · as bought on AliExpress") if view == "current" \
-        else ("relay module · bypassed, COM–NO jumper", "servo rail follows the main switch, as in Leika")
-    part_svg.append(f'<path d="M1072 470H1100V392H1152" fill="none" stroke="#7f8f99" stroke-width="1" stroke-dasharray="2 3"/>'
+    rl = ("servo rail joint · WAGO 221-412", "relay removed in session 6 · rail follows the pack")
+    part_svg.append(f'<path d="M1054 517H1100V392H1152" fill="none" stroke="#7f8f99" stroke-width="1" stroke-dasharray="2 3"/>'
                     + text(1156, 388, rl[0], 9, anchor="start", cls="lbl") + text(1156, 400, rl[1], 8, anchor="start", fill="#8fa0ab"))
     stub_out, stmeta = stubs(view, pins)
     title = "KalebV2 wiring · bench today (session 5)" if view == "current" else "KalebV2 wiring · target, robot complete"
