@@ -36,7 +36,7 @@ WIRES = [
     w("bat-fuse", "current", "ok", "BAT+", "awg14", "LiPo + (XT60)", "fuse holder",
       ["bat.pos", ("xy", "fuse.in")], "7.55V after the fuse, same as the pack. The fuse stays out while anything on the power path changes."),
     w("bat-sw", "final", "plan", "BAT+", "awg14", "LiPo + (XT60)", "main switch",
-      ["bat.pos", ("xy", "sw.in")], "Main switch on battery +, as in michaelkubina and Leika. Owned, not mounted. With the relay bypassed it is the only servo power control, so it must be rated for the full 10A DC."),
+      ["bat.pos", ("xy", "sw.in")], "Main switch on battery +, as in michaelkubina and Leika. Owned, not mounted. With the relay gone it is the only servo power control, so it must be rated for the full 10A DC."),
     w("sw-fuse", "final", "plan", "BAT+", "awg14", "main switch", "fuse holder", ["sw.out", ("xy", "fuse.in")]),
     w("fuse-acs", "both", "ok", "BAT+", "awg14", "fuse holder", "ACS712 IP+",
       ["fuse.out", ("x", 495), ("yx", "acs.IP+")], "ATO 10A blade in an inline holder."),
@@ -64,23 +64,17 @@ WIRES = [
       ["esp.GND_top18", ("y", 44), ("x", 890), ("y", 900), ("xy", "black.s7")]),
 
     # ---------------------------------------------------------------- 6V servo rail
-    w("sz-relay", "both", "ok", "6V", "awg14", "SZBK07 OUT+", "relay COM",
-      ["sz.OUT+", ("x", 940), ("y", 560), ("xy", "relay.COM")], "6.0V measured at OUT+ with the pack connected."),
-    w("relay-pca", "both", "ok", "6V", "awg16", "relay NO", "PCA9685 V+ screw",
-      ["relay.NO", ("y", 585), ("x", 1095), ("y", 420), ("xy", "pca.V+")],
-      "AWG16 because the 3.5mm terminal takes 1.5mm² at most. 0V with the relay open, 6.0V closed by hand."),
+    w("sz-rail", "both", "ok", "6V", "awg14", "SZBK07 OUT+", "servo rail WAGO",
+      ["sz.OUT+", ("x", 940), ("y", 560), ("xy", "wrail.p1")],
+      "Session 6: the relay was removed and its two wires joined in a WAGO 221-412, stripped to 11mm and tug-tested. The rail is live whenever the pack is connected."),
+    w("rail-pca", "both", "ok", "6V", "awg16", "servo rail WAGO", "PCA9685 V+ screw",
+      ["wrail.p2", ("y", 585), ("x", 1095), ("y", 420), ("xy", "pca.V+")],
+      "AWG16 because the 3.5mm terminal takes 1.5mm² at most. Session 6: 6.0V with the pack connected, 0V after unplugging, decaying over a few seconds."),
     w("pca-gnd", "both", "ok", "GND", "awg16", "PCA9685 GND screw", "black bus bar",
       ["pca.T_GND", ("y", 410), ("x", 1625), ("y", 905), ("xy", "black.s6")],
       "Servo return current. Added in session 5, replacing a Dupont sized for logic."),
     w("sz-out-gnd", "both", "ok", "GND", "awg14", "SZBK07 OUT−", "black bus bar",
       ["sz.OUT-", ("x", 870), ("y", 910), ("xy", "black.s5")]),
-
-    # ---------------------------------------------------------------- relay control
-    w("relay-jumper", "final", "plan", "6V", "awg14", "relay COM", "relay NO", ["relay.COM", ("curve", "relay.NO")],
-      "Decided 2026-09-19: the relay is bypassed. The rail is live whenever the pack is connected and the main switch is on, as in Leika. No firmware patch needed."),
-    w("relay-vcc", "current", "ok", "5V", "dupont", "relay VCC", "red bus bar", ["relay.VCC", ("y", 360), ("xy", "red.s8")]),
-    w("relay-gnd", "current", "ok", "GND", "dupont", "relay GND", "black bus bar",
-      ["relay.GND", ("y", 395), ("x", 975), ("y", 895), ("xy", "black.s8")]),
 
     # ---------------------------------------------------------------- 3.3V and I2C
     w("esp-3v3", "both", "ok", "3V3", "dupont", "ESP32 3V3", "3V3 WAGO", ["esp.3V3", ("y", 200), ("xy", "w33.p1")], WAGO_DUPONT),
@@ -118,7 +112,7 @@ WIRES = [
     w("vs-in", "final", "later", "BAT+", "dupont", "after the fuse", "voltage sensor VCC", ["acs.IP+", ("curve", "vsens.VCC")]),
     w("vs-gnd", "final", "later", "GND", "dupont", "voltage sensor GND", "future GND tap", ["vsens.GND", ("curve", "gtap.p1")]),
     w("tap-bar", "final", "later", "GND", "awg16", "future GND tap", "black bus bar", ["gtap.p5", ("curve", "black.s12")],
-      "Removing the relay GND frees a second position on the black bar. A WAGO off it, or a second bar, takes the late grounds."),
+      "The black bar has two free positions since session 6. A WAGO off one of them takes the late grounds."),
     w("cam-5v", "final", "later", "5V", "dupont", "ESP32-CAM 5V", "red bus bar", ["cam.5V", ("curve", "red.s5")]),
     w("cam-gnd", "final", "later", "GND", "dupont", "ESP32-CAM GND", "future GND tap", ["cam.GND", ("curve", "gtap.p2")]),
     w("oled-vcc", "final", "later", "3V3", "dupont", "OLED VCC", "3V3 WAGO", ["oled.VCC", ("curve", "w33.p4")]),
@@ -130,8 +124,6 @@ WIRES = [
 
 # Loose ends: signals whose ESP32 pin is read from the firmware when the part is integrated.
 STUBS = [
-    dict(view="current", status="open", pin="relay.IN", dx=0, dy=-26, net="SIG",
-         label="IN not wired", note="PNP input: the relay stays open only above ~4.2V. No ESP32 pin gets there, so GPIO27 cannot drive this module."),
     dict(view="final", status="later", pin="hc1.TRIG", dx=0, dy=30, net="SIG", label="", note="TRIG: 3.3V from the ESP32 is enough. Pin comes from the firmware config."),
     dict(view="final", status="later", pin="hc1.ECHO", dx=0, dy=30, net="SIG", label="TRIG/ECHO · pins TBD", note="5V echo through a 1k/2k divider before the ESP32."),
     dict(view="final", status="later", pin="hc2.TRIG", dx=0, dy=30, net="SIG", label="", note="TRIG: 3.3V from the ESP32 is enough. Pin comes from the firmware config."),

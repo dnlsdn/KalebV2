@@ -1,52 +1,35 @@
 # Power-Up & Power-Down Procedures
 
-## Correct Power-Up Sequence (Safe Startup)
+Rewritten in session 6, when the relay was removed. The servo rail now follows the battery: **a
+connected pack means live servos.**
 
-Follow this sequence **every time** before testing or operating the robot:
+## The rule
 
-1. **Connect USB to ESP32**
-   - Powers logic and allows serial monitoring
-   - Ensures firmware is running and stable
+- **The fuse stays in.** It is protection, not a switch. It comes out only while something on the
+  power path is being changed, and a blade fuse holder's clips loosen if it is used as a switch.
+- **The XT60 is connected last and disconnected first.** Whichever contact closes last takes the
+  spark of the step-down and PCA9685 capacitors charging, and the XT60 is made for that.
+- Once the main switch is mounted, the switch turns the robot on and off, and the XT60 is only mated
+  or unmated with the switch off.
 
-2. **Connect LiPo battery**
-   - Battery is now physically connected but not yet driving the servo rail
+## Power-up
 
-3. **Insert the main fuse**
-   - Enables the power distribution network
-   - Servo rail is still disabled by the relay
+1. **Check what is plugged in.** Know whether servos are connected: they will be powered the moment
+   the pack is.
+2. **Fuse in**, if it was taken out.
+3. **USB to the ESP32**, if the session needs serial or flashing. Optional: the ESP32 also runs from
+   the red bus bar once the pack is in.
+4. **Connect the XT60.** The 5V logic rail and the 6V servo rail come up together. The PCA9685 holds
+   all its outputs off at power-up, so servos get power but no pulse until the firmware sends one.
 
-4. **Verify relay state = OFF**
-   - Servo power must be physically disconnected
-   - PCA9685 V+ should read 0 V
+## Power-down
 
-5. **Enable relay (Relay ON)**
-   - 6 V servo rail is applied to PCA9685
-   - Servos power up in a controlled and predictable state
+1. **Stop the servos** — no motion, no load — before cutting power.
+2. **Unplug the XT60.** The rails decay to 0V over a few seconds as the capacitors discharge.
+3. **Unplug USB.** The red bus bar is live at 4.93V from USB alone, through the ESP32's VIN pin.
+4. **Fuse out** only if the next job touches the power path.
 
-This sequence guarantees:
-- No uncontrolled servo motion
-- No current spikes at boot
-- No brown-out on ESP32
+## Before touching the power path
 
----
-
-## Correct Power-Down Sequence (Safe Shutdown)
-
-Follow this order **every time** you shut the system down:
-
-1. **Disable relay (Relay OFF)**
-   - Immediately removes power from all servos
-
-2. **Remove the main fuse**
-   - Isolates the battery from the power system
-
-3. **Disconnect LiPo battery**
-   - Battery fully removed from the circuit
-
-4. **Disconnect USB from ESP32**
-   - Logic and debugging power removed
-
-This ensures:
-- Servos are never powered without control
-- No accidental motion during shutdown
-- Maximum electrical safety
+Pack unplugged, fuse out, USB unplugged, and **0V between the red and black bus bars** on the
+multimeter before starting.
