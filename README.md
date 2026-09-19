@@ -33,6 +33,12 @@ traced to the wiring or to the software without guessing.
 
 For the current state of the build and what comes next, see [STATE.md](STATE.md).
 
+The wiring is drawn in [`docs/wiring/`](docs/wiring/): the bench as it is today and the robot as it
+will be, with the gauge, net and measured value of every wire. The interactive version is at
+[dnlsdn.github.io/KalebV2/wiring](https://dnlsdn.github.io/KalebV2/wiring/).
+
+![Wiring, bench today](docs/wiring/wiring-current.svg)
+
 ---
 
 ## A note on the firmware

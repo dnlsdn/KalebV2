@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-08-27, session 5.
+**Last updated:** 2026-09-19, planning between sessions 5 and 6.
 
 ---
 
@@ -46,11 +46,16 @@ Leika itself is flashed — it is a submodule project with a filesystem image an
 and it does not build in the Arduino IDE.
 
 **Leika contains no relay** — checked in session 5, across its code and its component list, which
-specifies a manual main power switch instead. So when Leika is flashed, nothing will drive the servo
-rail control pin and the servos will never be powered. The fix is a two-line addition to Leika's
-setup, or a link in place of the relay, and it belongs to the session where Leika is flashed. Leika
-does confirm SDA 21 / SCL 22, matching this build, and it has an `[env:esp32dev]` target, so a plain
-ESP32 is supported.
+specifies a manual main power switch instead. Leika does confirm SDA 21 / SCL 22, matching this
+build, and it has an `[env:esp32dev]` target, so a plain ESP32 is supported.
+
+**Decided on 2026-09-19: the relay is bypassed, and this build follows Leika.** A jumper between
+COM and NO keeps the servo rail live whenever the pack is connected, and the main switch on battery
++ (owned, not mounted yet) becomes the servo power control. Leika runs unmodified. The alternatives
+were weighed and dropped to keep the project simple: an NPN stage or a series LED in front of the
+current module, or a KY-019 / HW-482 — the active-high NPN module michaelkubina and the Nitro-Fork
+use, which a 3.3V pin drives directly. The module bought here is the blue low-level-trigger variant
+of its AliExpress listing, which is why it never worked like the reference project's.
 
 ---
 
@@ -82,7 +87,7 @@ is printing.
 2026-08-14 from the same AliExpress listing and store the original twelve came from (Kevixun Store),
 so the replacements are identical to the ten already on the legs: two for the robot, two as spares.
 **They arrived on 2026-08-27** and are on the bench. They are still not centred at 1500µs, and
-cannot be until the servo rail can be commanded.
+cannot be until the servo rail is live — session 6 bypasses the relay for that.
 
 **Electronics.** The old wiring was scrapped on 2026-04-12 and rebuilt around two bus bars: black
 for the ground star, red for the 5V logic rail. Every connection below was measured on 2026-07-31,
@@ -121,7 +126,7 @@ rail, verified by continuity against both screws. A second one would only enlarg
 relay contacts see at closing. The spare 1000µF 16V is kept as a documented remedy if the rail
 collapses on peaks later, to be fitted **before the relay**, on the SZBK07 output.
 
-**What remains on the signal side is the relay control, and the twelve servo channels.**
+**What remains is the relay bypass (session 6) and the twelve servo channels.**
 
 **Battery.** Healthy. Cells at 3.78V each, perfectly balanced, pack at 7.55V. About half charge, so
 it needs a top-up before any test that actually drives the servos.
@@ -151,8 +156,7 @@ voltage sensor, after the robot walks. A WAGO tapped off the bar, or a second ba
 time comes.
 
 **Firmware.** An I2C scanner in session 4, and `relay_off_on_safe` flashed in session 5. That sketch
-is now **wrong for the hardware** and has to be rewritten once the transistor stage exists, because
-the sense of the pin inverts.
+has no job once the relay is bypassed and stays in `code/` only as a record.
 
 ---
 
@@ -176,36 +180,21 @@ not by a document.
 
 ---
 
-## Next session — Session 6: the transistor stage on the relay control
+## Next session — Session 6: bypass the relay
 
-The only thing standing between this build and a servo that moves. The pack stays disconnected and
-the fuse stays out for the whole build; the stage can be tested entirely on USB, because it is
-verified by whether the relay clicks, not by what the rail does.
+The relay cannot be driven by the ESP32 and the decision is not to add parts to make it. A jumper
+makes the servo rail follow the pack, exactly as in Leika, and unblocks the first servo.
 
-Why a transistor and not a wire: the module's IN pin is a PNP base sitting at 4.2V, and the relay is
-open only while IN stays above that. No ESP32 output level reaches it. An NPN between GPIO27 and IN
-inverts the command and decouples the levels, and it makes the safe state the natural one — with the
-transistor off, IN is simply left alone at 4.2V and **the relay is open with no software involved.**
+- [ ] Pack disconnected and fuse out for the whole job.
+- [ ] AWG14 jumper between the relay's **COM and NO** screws. The module stays mounted as a
+      terminal block, so the change can be undone in a minute.
+- [ ] Remove the three Dupont on the relay's logic header: IN (if still there), VCC and GND. The
+      module no longer does anything electrically, and this frees one position on each bar.
+- [ ] Fuse in, pack connected, **no servo**: PCA9685 V+ reads **6.0V**. Pack out: **0V**.
+- [ ] Update `current-power-&-wiring-connections.md` and the wiring diagram in `docs/wiring/`,
+      write `main-steps/6-relay-bypass.md`, update this file, one commit.
 
-The stage: GPIO27 through a **1k base resistor** to the base of a small NPN (2N2222, BC547, S8050 or
-equivalent); **10k from base to ground** so the base cannot float while GPIO27 is undriven at boot;
-**collector to the relay's IN pin**; **emitter to the black bus bar**. Confirm the parts are in the
-drawer before starting — if there is no NPN on the bench, the alternative is an optocoupled relay
-module with a separate JD-VCC jumper, which is a part to order.
-
-- [ ] Confirm an NPN, a 1k and a 10k are on the bench.
-- [ ] Build the stage. Emitter to the black bus bar, which has one free position left.
-- [ ] Rewrite `code/relay_off_on_safe`: **the sense inverts.** GPIO27 LOW is now relay OFF, and
-      that is also what an undriven pin gives, so the safe state costs nothing. Flash it before
-      connecting the collector to IN.
-- [ ] Write a second sketch that closes the rail on a serial command, so the relay can be commanded
-      on deliberately rather than by touching a wire to ground.
-- [ ] Verify on USB alone, no pack: relay silent with GPIO27 low, and it clicks on command. Then
-      press EN and confirm it does not click during the reset — that is the boot window.
-- [ ] Only then, pack in: PCA9685 V+ reads 0V with the rail off and 6.0V with it on, **no servo
-      connected.**
-- [ ] Update `current-power-&-wiring-connections.md`, write `main-steps/6-relay-control.md`, update
-      this file, one commit.
+Before session 7 (the first servo): **charge the pack.** It sits at about half charge.
 
 ---
 
@@ -214,14 +203,16 @@ module with a separate JD-VCC jumper, which is a part to order.
 1. **One single servo.** Centered at 1500µs. One, not twelve.
 2. **The remaining eleven servos**, on michaelkubina's channel map: front left 0/1/2, front right
    3/4/5, rear left 6/7/8, rear right 9/10/11, in the order shoulder, upper leg, lower leg. The
-   replacement servos arrived on 2026-08-27, so nothing waits on delivery any more.
+   replacement servos arrived on 2026-08-27, so nothing waits on delivery any more. An extension
+   cable is on hand for every servo; the lower legs need them.
 3. **Reinforce the PCA9685's V+ and GND traces with solder.** Leika's own documentation recommends
    it, and those traces are the narrowest point of the whole servo power path — narrower than the
    AWG16 feeding them. Before the robot carries its own weight.
 4. **Leika: build and flash.** PlatformIO, submodules, filesystem image. Calibrate all twelve
-   channels. **Leika has no relay support**: GPIO27 will never be driven, so the servo rail will
-   stay open until a two-line addition is made to its setup, or a link replaces the relay.
-5. **Legs onto the chassis, first steps.**
+   channels. With the relay bypassed, Leika runs unmodified.
+5. **Mount the main switch** on battery +, between the XT60 and the fuse. Owned already. With the
+   relay bypassed it is the only servo power control, so check its DC current rating first.
+6. **Legs onto the chassis, first steps.**
 
 **After it walks:** MPU6050 tuning, ACS712 output to GPIO34, voltage sensor, HC-SR04 with the
 dividers, ESP32-CAM, OLED.
@@ -256,10 +247,8 @@ every wire after closing the lever.
   breaking under load and capacitor inrush, so the relay is only ever switched with the servos idle.
 - **Does Leika expect the relay on GPIO27?** **Answered in session 5: it expects no relay at all.**
   See the firmware section above.
-- **Will the NPN stage actually switch this module?** The base resistor value assumes an ordinary
-  small-signal NPN and a module whose input needs a few milliamps. If the relay does not pull in
-  cleanly with 1k, the next step is to measure the current the IN pin draws when grounded and size
-  the base resistor from that number rather than from a guess.
+- **Will the NPN stage actually switch this module?** **Closed on 2026-09-19** — no stage is built;
+  the relay is bypassed instead.
 
 ---
 
@@ -268,11 +257,9 @@ every wire after closing the lever.
 - The pack stays disconnected while anything on the power path is being changed.
 - The SZBK07 heatsink bars are live at battery potential. Nothing at ground touches them, no metal
   tool near them while powered, and they never get mounted against a conductive surface.
-- The relay stays OFF unless a servo test is actively running, and it is only ever switched with the
-  servos idle — never under load.
-- **No servo is connected until the relay can be commanded off and on deterministically.** Until the
-  transistor stage exists, the rail can only be closed by touching a wire to ground, which is not a
-  control.
+- **Once the relay is bypassed, a connected pack means live servos.** The servo rail follows the
+  XT60, and later the main switch. Unplug the pack before touching anything on the servo side.
+- Servo power is only ever switched with the servos idle — never under load.
 - No firmware touches the ultrasonic sensors until the ECHO dividers are in place.
 - Every voltage claim in a session log is a multimeter reading, not an assumption.
 
@@ -284,6 +271,11 @@ One session = one goal = one file in `main-steps/` = one commit.
 
 A session starts by reading this file and ends by updating it. Nothing else keeps track of the
 state of the bench between sessions.
+
+**The wiring diagram is updated in the same commit.** `docs/wiring/` draws the bench as it is and the
+robot as it will be. Any session that adds, moves or removes a wire edits `wires.py` (and
+`layout.py` if a module moves), reruns `python3 build.py && python3 page.py` in that folder, and
+republishes the interactive page.
 
 **A session also starts by asking whether the step is worth doing at all** — whether it is on the
 path to walking, whether it is urgent now, and whether something cheaper should come first. Session

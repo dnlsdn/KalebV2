@@ -25,3 +25,7 @@ __pycache__/
 
 # Logs
 *.log
+
+# Wiring diagram build intermediates
+docs/wiring/wiring.json
+docs/wiring/wiring.html
