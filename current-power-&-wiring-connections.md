@@ -167,6 +167,14 @@ Verified: the red bus bar and the black bus bar are not connected to each other.
 
 ---
 
+## Servo on the bench
+
+| Channel | Servo | State |
+|---|---|---|
+| 0 | Replacement MG996R, horn off | Verified in session 7: centred at 1500µs and held; V+ 6.0V, red bar 4.98V while holding |
+
+---
+
 ## Not wired yet
 
 | Connection | Note |
@@ -174,8 +182,8 @@ Verified: the red bus bar and the black bus bar are not connected to each other.
 | ACS712 OUT to GPIO34 | After it walks |
 | Battery voltage sensor | Not mounted, after it walks |
 | HC-SR04 TRIG and ECHO | After it walks, ECHO through a 1kΩ/2kΩ divider |
-| 12 servos on PCA9685 channels 0-11 | Front left 0/1/2, front right 3/4/5, rear left 6/7/8, rear right 9/10/11 |
+| Servos on PCA9685 channels 1-11 | Front left 0/1/2, front right 3/4/5, rear left 6/7/8, rear right 9/10/11. Channel 0 holds a bench test servo |
 
 ---
 
-**Last verified:** 2026-09-19, session 6.
+**Last verified:** 2026-09-19, session 7.

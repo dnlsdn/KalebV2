@@ -42,12 +42,21 @@ Before blaming either, pull on every Dupont wire sitting in a WAGO connector. Th
 those connectors are rated for and one of them has already failed to make contact once, in session
 4.
 
-## `relay_off_on_safe`
+## `servo_center`
 
-Drives GPIO27 high so the servo rail relay is explicitly open. Flash it before wiring anything to
-the relay's control pin.
+Drives PCA9685 channel 0 to 1500µs, the servo centre, and holds it. Used to centre a servo before its
+horn goes on, and as the smallest test that the whole chain — ESP32, I2C, PCA9685, 6V rail — works
+under a real load. Needs **Adafruit PWM Servo Driver Library** (3.0.3 used).
 
-It is a safety default, not a feature: the relay module is active-low, and between power-up and the
-first line of `setup()` nothing drives that pin at all. A **10k pull-up from GPIO27 to 3.3V** is
-what actually holds the rail open during those milliseconds. Without it, the 6V rail can close at
-boot before the PCA9685 has been told anything, with twelve servos on the other side of it.
+Flash on USB with the XT60 unplugged. Then unplug USB, plug the servo into channel 0 (brown GND, red
+V+, orange PWM) and connect the pack. The servo moves once and holds. USB and the pack never go in
+together — see `Power-Up & Power-Down Procedures.md`.
+
+---
+
+## `relay_off_on_safe` — retired
+
+Kept only as a record. It drove GPIO27 high to hold the servo rail relay open, on the assumption
+that the module was active-low with a plain input. Session 5 found its input is a PNP base that no
+ESP32 pin can hold open, and the planned 10k pull-up would not have helped. The relay was removed in
+session 6: the servo rail now follows the pack, as in Leika.
