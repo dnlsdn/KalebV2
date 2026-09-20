@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-09-19, session 7.
+**Last updated:** 2026-09-20, session 8.
 
 ---
 
@@ -79,15 +79,32 @@ session, ahead of the entire servo chain, for a subsystem whose firmware is not 
 
 ## Where the build is
 
-**Mechanics.** Wrist, upper leg and shoulder done. All four legs assembled. Ten of the twelve servos
-were centered at 1500µs before their horns were mounted, so nothing has to be taken apart. Chassis
-is printing.
+**Mechanics.** All four legs are complete through michaelkubina's "Attach Servo to Shoulder Joint":
+wrist, upper leg, shoulder joint and shoulder servo. Chassis is printing.
+
+**Servos are not all centred — each joint has its own angle**, set before its horn goes on, and this
+file said otherwise until session 8:
+
+| Joint | Left legs | Right legs | When |
+|---|---|---|---|
+| Wrist (lower leg) | 0° | 180° | November 2025 |
+| Upper leg (hip) | 120° | 60° | session 8 |
+| Shoulder | 90° | 90° | session 8 |
+
+Angles are on the Arduino `Servo` library's scale, 0° = 544µs and 180° = 2400µs, which is what
+`code/servo_angle` reproduces through the PCA9685. Leika's defaults assume this same geometry and
+calibrate what is left over per channel.
+
+**Two things about the legs are unverified**, both settled by the next mechanical step: the sense of
+the one-arm offset on the shoulder joint horn, and whether each shoulder servo's shaft faces the
+nose (front legs) or the tail (rear legs). A wrong offset shows up in calibration as a leg that runs
+out of travel forward instead of backward, and costs one screw to fix.
 
 **Two servos failed** — broken or misbehaving — and were replaced. Four MG996R-180 were ordered on
 2026-08-14 from the same AliExpress listing and store the original twelve came from (Kevixun Store),
 so the replacements are identical to the ten already on the legs: two for the robot, two as spares.
-**They arrived on 2026-08-27.** One was centred at 1500µs in session 7 and waits, horn off, for its
-leg; its shaft must not be turned by hand. The other is still to be centred.
+**They arrived on 2026-08-27** and both went into the legs as shoulder servos in session 8, at 90°,
+together with the two good originals.
 
 **Electronics.** The old wiring was scrapped on 2026-04-12 and rebuilt around two bus bars: black
 for the ground star, red for the 5V logic rail. Every connection below was measured on 2026-07-31,
@@ -165,22 +182,20 @@ not by a document.
 
 ---
 
-## Next session — Session 8: both replacement servos into their legs
+## Next session — Session 9: the legs onto the outer shoulders
 
-The two failed servos left two empty positions in the legs. Both replacements have to be centred
-before their horns go on, and one already is. This is a **mechanical session**: the only electrical
-step is centring the second servo with a sketch that already works, and it comes first.
+michaelkubina's "Connecting to the Shoulders". A mechanical session, and the one that answers the
+two open questions from session 8, because the outer shoulder pieces fit one way only.
 
-- [ ] Find and write down **which two positions** are empty: leg, and shoulder / upper leg / lower
-      leg. Not recorded anywhere yet.
-- [ ] Centre the second replacement: `servo_center` is already on the ESP32. Servo on channel 0,
-      XT60 in, it moves and holds, XT60 out. No USB needed.
-- [ ] Mount both servos in their positions and seat the horns **without turning the shafts**,
-      following michaelkubina's assembly guide for the horn angle.
-- [ ] Update this file and `current-power-&-wiring-connections.md`, write
-      `main-steps/8-replacement-servos.md`, one commit.
+- [ ] Check the two **Outer Shoulder** pieces are printed.
+- [ ] Screw a servohorn to each outer shoulder piece (M2x8 and M2 nuts, middle hole of each arm).
+- [ ] Shoulder servos are already at 90°: do not turn those shafts. Screw each leg to its outer
+      shoulder with two M3x8, with the horn arms perpendicular as the guide shows.
+- [ ] While the legs are in hand, **rewrite the tape labels** with the real channel map: front left
+      0/1/2, front right 3/4/5, rear left 6/7/8, rear right 9/10/11, shoulder / upper leg / lower leg.
+- [ ] Write `main-steps/9-outer-shoulders.md`, update this file, one commit.
 
-Before session 9, when all twelve are connected: **charge the pack.**
+Before session 10, when all twelve servos are wired: **charge the pack.**
 
 ---
 

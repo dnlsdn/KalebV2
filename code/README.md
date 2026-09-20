@@ -54,6 +54,17 @@ together — see `Power-Up & Power-Down Procedures.md`.
 
 ---
 
+## `servo_angle`
+
+`servo_center` with an angle instead of a fixed 1500µs. Change `ANGLE` at the top — 60, 90 or 120 —
+flash, and channel 0 goes there and holds. Used in session 8 to set every joint to the angle
+michaelkubina's assembly guide asks for before its horn goes on.
+
+The conversion matches the Arduino `Servo` library, which positioned the wrists in November 2025:
+0° = 544µs, 180° = 2400µs. So 60° = 1163µs, 90° = 1472µs, 120° = 1781µs.
+
+---
+
 ## `relay_off_on_safe` — retired
 
 Kept only as a record. It drove GPIO27 high to hold the servo rail relay open, on the assumption
