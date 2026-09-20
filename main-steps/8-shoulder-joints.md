@@ -69,3 +69,5 @@ mechanical step settles it.
 - The tape labels on the legs carry an old channel map. They have to be rewritten to
   michaelkubina's — front left 0/1/2, front right 3/4/5, rear left 6/7/8, rear right 9/10/11 —
   before anything is wired.
+
+<img width="482" height="656" alt="image" src="https://github.com/user-attachments/assets/63946c58-df6f-4bc9-9514-6bcb49919129" />
