@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-09-20, session 8.
+**Last updated:** 2026-09-20, session 9.
 
 ---
 
@@ -79,8 +79,13 @@ session, ahead of the entire servo chain, for a subsystem whose firmware is not 
 
 ## Where the build is
 
-**Mechanics.** All four legs are complete through michaelkubina's "Attach Servo to Shoulder Joint":
-wrist, upper leg, shoulder joint and shoulder servo. Chassis is printing.
+**Mechanics.** The legs are done and hang in two pairs from the Outer Shoulder pieces, front and
+rear — michaelkubina's guide through "Connecting to the Shoulders". Each pair is parallel and
+symmetric. What is left is the body: the chassis frame, then the two groups bolted to it.
+
+**Printing** is tracked in `docs/print-list.md`. Inner Shoulder, Chassis Side, Top Shoulder and
+Bottom Shoulder are printed, two of each; the circuitry mounting plate (SZBK07 Extended) is on the
+printer; the three LiPo brackets follow.
 
 **Servos are not all centred — each joint has its own angle**, set before its horn goes on, and this
 file said otherwise until session 8:
@@ -95,10 +100,10 @@ Angles are on the Arduino `Servo` library's scale, 0° = 544µs and 180° = 2400
 `code/servo_angle` reproduces through the PCA9685. Leika's defaults assume this same geometry and
 calibrate what is left over per channel.
 
-**Two things about the legs are unverified**, both settled by the next mechanical step: the sense of
-the one-arm offset on the shoulder joint horn, and whether each shoulder servo's shaft faces the
-nose (front legs) or the tail (rear legs). A wrong offset shows up in calibration as a leg that runs
-out of travel forward instead of backward, and costs one screw to fix.
+**One thing about the legs is still unverified:** the sense of the one-arm offset on the shoulder
+joint horn. It shows up in calibration as a leg that runs out of travel forward instead of backward,
+and costs one screw to fix. The shaft direction was cleared in session 9, when both pairs came out
+symmetric.
 
 **Two servos failed** — broken or misbehaving — and were replaced. Four MG996R-180 were ordered on
 2026-08-14 from the same AliExpress listing and store the original twelve came from (Kevixun Store),
@@ -182,20 +187,25 @@ not by a document.
 
 ---
 
-## Next session — Session 9: the legs onto the outer shoulders
+## Next session — Session 10: the body, and the legs onto it
 
-michaelkubina's "Connecting to the Shoulders". A mechanical session, and the one that answers the
-two open questions from session 8, because the outer shoulder pieces fit one way only.
+michaelkubina's "Body" and "Mount legs to chassis". Mechanical, and it needs the circuitry mounting
+plate off the printer first.
 
-- [ ] Check the two **Outer Shoulder** pieces are printed.
-- [ ] Screw a servohorn to each outer shoulder piece (M2x8 and M2 nuts, middle hole of each arm).
-- [ ] Shoulder servos are already at 90°: do not turn those shafts. Screw each leg to its outer
-      shoulder with two M3x8, with the horn arms perpendicular as the guide shows.
-- [ ] While the legs are in hand, **rewrite the tape labels** with the real channel map: front left
-      0/1/2, front right 3/4/5, rear left 6/7/8, rear right 9/10/11, shoulder / upper leg / lower leg.
-- [ ] Write `main-steps/9-outer-shoulders.md`, update this file, one commit.
+- [ ] Check **four 625zz ball bearings** are left: four of the eight went into the legs.
+- [ ] Two M3 nuts into each Top and Bottom Shoulder block, pockets facing into the body, then screw
+      each Inner Shoulder into place with four M3x8.
+- [ ] Four M3 nuts into each Chassis Side, flat face outwards, cutout for the mounting plate at the
+      bottom. Put the mounting plate between the two sides, then the inner shoulders with four M3x8
+      each, larger blocks at the top.
+- [ ] Ball bearings onto the shoulder joints, M3 nuts into the front of the top and bottom blocks,
+      then each leg group to the chassis with four M3x8.
+- [ ] Check the Outer Shoulder pieces end up facing **outwards**, front towards the nose and rear
+      towards the tail. This is the last open question from session 8.
+- [ ] Write `main-steps/10-body.md`, update this file, one commit.
 
-Before session 10, when all twelve servos are wired: **charge the pack.**
+After that the robot is a robot in shape: the next session wires the twelve servos, and **the pack
+needs charging before it.**
 
 ---
 
