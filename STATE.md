@@ -154,8 +154,16 @@ pack now means live servos.**
 replacement servo went to its centre and held. V+ stayed at **6.0V** and the red bar at **4.98V**
 while it held. The whole chain works under a real load.
 
-**Battery.** 7.55V, cells at 3.78V each and balanced, measured at the start of session 7. About half
-charge: enough for one servo, **charge it before several servos are powered together.**
+**Battery.** Ovonic 2S1P LiPo, **5200mAh, 50C**, 7.4V nominal, 38.48Wh, Deans T-plug with a
+T-to-XT60 adapter, 3-pin balance lead. **Fully charged on 2026-09-21**: 7.52V at rest before, 8.40V at
+the end, **3833mAh** put in. That was about three quarters of the pack — it had been nearer a quarter
+full than the half that 3.78V per cell suggested, because a LiPo's voltage barely moves across the
+middle of its charge. Use the charger's mAh, not the voltage, to judge how full it is.
+
+**Charging**, with a SkyRC B6neo on a USB-C PD supply (reads 20V in): battery off the bench first;
+program **LiPo / 2S / Balance CHG / 4.20V / 3.0A**; XT60 into the charger's OUT, balance plug into
+the `−123456` port with its black edge on `−`; Start. About 90 minutes from a quarter. Unplug XT60,
+then balance lead, then USB-C. The charger came set to 4S: check the cell count every time.
 
 **USB and the pack never go in together** — Espressif's DevKitC guide, found in session 7. Flash on
 USB with the XT60 unplugged, then unplug USB before connecting the pack.
