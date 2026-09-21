@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-09-21, session 10.
+**Last updated:** 2026-09-21, session 11.
 
 ---
 
@@ -105,10 +105,9 @@ Angles are on the Arduino `Servo` library's scale, 0° = 544µs and 180° = 2400
 `code/servo_angle` reproduces through the PCA9685. Leika's defaults assume this same geometry and
 calibrate what is left over per channel.
 
-**The hips moved during assembly** (session 10): their horns are no longer seated exactly at
-120°/60°. Under about 15° off, Leika's per-servo offset absorbs it; much more costs travel and means
-re-seating that horn. Checked first thing in session 11. The shoulders were re-checked at 90° in
-session 10 and are right.
+**Every joint was checked at its mounting angle in session 11** and is right. The hips that moved in
+session 10 were corrected, and the rear right knee (ch11), seated one horn arm off since November, was
+turned back by one arm without opening the leg.
 
 **Two servos failed** — broken or misbehaving — and were replaced. Four MG996R-180 were ordered on
 2026-08-14 from the same AliExpress listing and store the original twelve came from (Kevixun Store),
@@ -192,18 +191,18 @@ not by a document.
 
 ---
 
-## Next session — Session 11: the hips, then twelve servos
+## Next session — Session 12: twelve servos on their channels
 
-Electrical, on the bench, with the assembled robot next to it on a support. **Charge the pack first**,
-balance charge.
+Electrical, on the bench, robot on its box. **The pack must be balance-charged first** — twelve servos
+powered together draw far more than one.
 
-- [ ] **Hip check.** `servo_angle` at 120° for ch1 and ch7, at 60° for ch4 and ch10, one servo at a
-      time on channel 0. The thigh should sit about 30° from its shoulder block, sloping to the tail.
-      Estimate the error on each. Under ~15°: note it for calibration. More: re-seat that horn.
-- [ ] Only then, all twelve servos onto their real channels, front left 0/1/2, front right 3/4/5,
-      rear left 6/7/8, rear right 9/10/11, and a sketch that moves one channel at a time so each
-      joint is confirmed on the right channel.
-- [ ] Write `main-steps/11-…md`, update this file, the wiring map and `docs/wiring/`, one commit.
+- [ ] Plug every servo into its real channel: front left 0/1/2, front right 3/4/5, rear left 6/7/8,
+      rear right 9/10/11, shoulder / upper leg / wrist. Extensions on the lower legs.
+- [ ] A sketch that moves **one channel at a time** a little around its mounting angle, so each joint
+      is seen answering on the right channel before anything moves together.
+- [ ] Measure the 6V rail and the red bar with all twelve holding.
+- [ ] Update `current-power-&-wiring-connections.md` and `docs/wiring/`, write
+      `main-steps/12-twelve-servos.md`, update this file, one commit.
 
 ---
 
