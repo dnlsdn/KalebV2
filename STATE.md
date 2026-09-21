@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-09-20, session 9.
+**Last updated:** 2026-09-21, session 10.
 
 ---
 
@@ -79,9 +79,14 @@ session, ahead of the entire servo chain, for a subsystem whose firmware is not 
 
 ## Where the build is
 
-**Mechanics.** The legs are done and hang in two pairs from the Outer Shoulder pieces, front and
-rear — michaelkubina's guide through "Connecting to the Shoulders". Each pair is parallel and
-symmetric. What is left is the body: the chassis frame, then the two groups bolted to it.
+**Mechanics.** **The robot is assembled** — chassis, both leg groups on it — through michaelkubina's
+"Mount legs to chassis". The circuitry mounting plate is in place and **empty**: the electronics stay
+on the bench until all twelve servos have run there. Only the covers, head and tail are left, and they
+come after it walks.
+
+**All four thighs slope towards the tail and every knee points back**, front and rear alike. That is
+the design, confirmed against michaelkubina's photo of his robot. Unpowered, the robot rests with its
+legs in the assembly pose and one pair of feet off the table; it must sit on a support when off.
 
 **Printing** is tracked in `docs/print-list.md`. Inner Shoulder, Chassis Side, Top Shoulder and
 Bottom Shoulder are printed, two of each; the circuitry mounting plate (SZBK07 Extended) is on the
@@ -100,10 +105,10 @@ Angles are on the Arduino `Servo` library's scale, 0° = 544µs and 180° = 2400
 `code/servo_angle` reproduces through the PCA9685. Leika's defaults assume this same geometry and
 calibrate what is left over per channel.
 
-**One thing about the legs is still unverified:** the sense of the one-arm offset on the shoulder
-joint horn. It shows up in calibration as a leg that runs out of travel forward instead of backward,
-and costs one screw to fix. The shaft direction was cleared in session 9, when both pairs came out
-symmetric.
+**The hips moved during assembly** (session 10): their horns are no longer seated exactly at
+120°/60°. Under about 15° off, Leika's per-servo offset absorbs it; much more costs travel and means
+re-seating that horn. Checked first thing in session 11. The shoulders were re-checked at 90° in
+session 10 and are right.
 
 **Two servos failed** — broken or misbehaving — and were replaced. Four MG996R-180 were ordered on
 2026-08-14 from the same AliExpress listing and store the original twelve came from (Kevixun Store),
@@ -187,31 +192,24 @@ not by a document.
 
 ---
 
-## Next session — Session 10: the body, and the legs onto it
+## Next session — Session 11: the hips, then twelve servos
 
-michaelkubina's "Body" and "Mount legs to chassis". Mechanical, and it needs the circuitry mounting
-plate off the printer first.
+Electrical, on the bench, with the assembled robot next to it on a support. **Charge the pack first**,
+balance charge.
 
-- [ ] Check **four 625zz ball bearings** are left: four of the eight went into the legs.
-- [ ] Two M3 nuts into each Top and Bottom Shoulder block, pockets facing into the body, then screw
-      each Inner Shoulder into place with four M3x8.
-- [ ] Four M3 nuts into each Chassis Side, flat face outwards, cutout for the mounting plate at the
-      bottom. Put the mounting plate between the two sides, then the inner shoulders with four M3x8
-      each, larger blocks at the top.
-- [ ] Ball bearings onto the shoulder joints, M3 nuts into the front of the top and bottom blocks,
-      then each leg group to the chassis with four M3x8.
-- [ ] Check the Outer Shoulder pieces end up facing **outwards**, front towards the nose and rear
-      towards the tail. This is the last open question from session 8.
-- [ ] Write `main-steps/10-body.md`, update this file, one commit.
-
-After that the robot is a robot in shape: the next session wires the twelve servos, and **the pack
-needs charging before it.**
+- [ ] **Hip check.** `servo_angle` at 120° for ch1 and ch7, at 60° for ch4 and ch10, one servo at a
+      time on channel 0. The thigh should sit about 30° from its shoulder block, sloping to the tail.
+      Estimate the error on each. Under ~15°: note it for calibration. More: re-seat that horn.
+- [ ] Only then, all twelve servos onto their real channels, front left 0/1/2, front right 3/4/5,
+      rear left 6/7/8, rear right 9/10/11, and a sketch that moves one channel at a time so each
+      joint is confirmed on the right channel.
+- [ ] Write `main-steps/11-…md`, update this file, the wiring map and `docs/wiring/`, one commit.
 
 ---
 
 ## Backlog — ordered, one per session, never two in the same evening
 
-1. **All twelve servos on the PCA9685**, on michaelkubina's channel map: front left 0/1/2, front right
+1. **All twelve servos on the PCA9685** (session 11), on michaelkubina's channel map: front left 0/1/2, front right
    3/4/5, rear left 6/7/8, rear right 9/10/11, in the order shoulder, upper leg, lower leg. The
    replacement servos arrived on 2026-08-27, so nothing waits on delivery any more. An extension
    cable is on hand for every servo; the lower legs need them.
