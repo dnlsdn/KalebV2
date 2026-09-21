@@ -8,7 +8,7 @@
 
 Adafruit_PWMServoDriver pca = Adafruit_PWMServoDriver(0x40);
 
-const int ANGLE = 90;  // 60, 90 or 120: change it and flash again
+const int ANGLE = 60;  // 60, 90 or 120: change it and flash again
 
 // Same mapping the Arduino Servo library used for the wrists in November:
 // 0 degrees = 544us, 180 degrees = 2400us.
