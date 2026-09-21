@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-09-21, session 13 started.
+**Last updated:** 2026-09-21, session 13: computer side done, bench side next.
 
 ---
 
@@ -212,8 +212,9 @@ not by a document.
 
 Still to do:
 
-- [ ] Open the Leika folder in VS Code, let PlatformIO install its core, then **Build** `esp32dev`.
-      Needs only the computer. If it fails, keep the last 40 lines of the output.
+- [x] **Build** `esp32dev` — succeeds, Flash 91.0% with the web app embedded. The first build had
+      silently left the app out for lack of `protoc`; how to spot and fix it is in
+      `firmware/leika-config.md`, with a desk check of what Leika will send to each servo.
 - [ ] With the ESP32, on USB, **XT60 unplugged**: **Upload Filesystem Image** once, then
       **Upload and Monitor**. The serial monitor shows Leika booting.
 - [ ] Phone on the `Spot-Micro` Wi-Fi (password `spot-leika`), open `http://192.168.4.1`, and check
