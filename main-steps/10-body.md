@@ -54,3 +54,5 @@ reason.
   `hardware/printable/helper_stand`; added to `docs/print-list.md`.
 - **Moving the electronics in**: which way round the mounting plate goes, and whether the two 12-screw
   bus bars fit on it at all.
+
+<img width="823" height="658" alt="image" src="https://github.com/user-attachments/assets/b188c35b-94b0-4e0f-a2f3-c3c2fe4fa764" />
