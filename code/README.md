@@ -65,6 +65,18 @@ The conversion matches the Arduino `Servo` library, which positioned the wrists 
 
 ---
 
+## `channel_check`
+
+Proves every servo answers on its own channel. The twelve mounting angles live in an array indexed by
+channel — front left 0/1/2, front right 3/4/5, rear left 6/7/8, rear right 9/10/11, shoulder / upper
+leg / wrist. At start each servo goes to its mounting angle one every half second; then, forever,
+one joint at a time moves 15° towards the middle of its travel and back, with a four second pause
+before ch0 comes round again.
+
+Run it again after anything is re-plugged, starting with the move of the electronics into the robot.
+
+---
+
 ## `relay_off_on_safe` — retired
 
 Kept only as a record. It drove GPIO27 high to hold the servo rail relay open, on the assumption
