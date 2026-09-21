@@ -90,19 +90,19 @@ def servos(view, pins):
             d = f"M{x0 + off:.1f} {y0}C{x0 + off:.1f} {my:.1f} {x1 + off:.1f} {my:.1f} {x1 + off:.1f} {y1}"
             dash = "" if bench else ' stroke-dasharray="12 5"'
             strands += f'<path d="{d}" fill="none" stroke="{col}" stroke-width="1.7"{dash} opacity=".9"/>'
-        if lower and not bench:
+        if lower:
             mx, my = x1, y1 - 16
             strands += f'<rect x="{mx - 7}" y="{my - 5}" width="14" height="10" rx="1.5" fill="#111" stroke="#bbb"/>'
         note = "Extension 10-15cm on the lower leg, as in michaelkubina and Leika." if lower else ""
         m = dict(id=wid, frm=f"PCA9685 ch{ch}", to=layout.BENCH_SERVOS[ch] if bench else f"{name} servo", net="servo",
                  kind="servo lead, brown GND · red V+ · orange PWM", status="ok" if bench else "plan",
-                 note=("Session 7: moved once to centre and held. V+ 6V and red bar 4.98V while holding." if bench
+                 note=("Session 12: on its real channel, confirmed by code/channel_check. V+ 6.0V and red bar 5.0V with all twelve holding." if bench
                        else (note + " Centre at 1500µs before the horn goes on.").strip()))
         meta.append(m)
         out.append(f'<g class="wire st-{m["status"]}" data-id="{wid}" tabindex="0"><title>{escape(m["frm"] + " → " + m["to"])}</title>{strands}'
                    f'<path class="hit" d="M{x0} {y0}C{x0} {(y0 + y1) / 2} {x1} {(y0 + y1) / 2} {x1} {y1}" fill="none" stroke="transparent" stroke-width="12"/></g>')
     if view == "current":
-        out.append(text(1395, 880, "ch0: test servo on the bench · the other 11 not connected yet", 10, cls="lbl"))
+        out.append(text(1395, 880, "12 servos on their real channels · robot on a stand beside the bench", 10, cls="lbl"))
     out.append(text(1160, 628, "FRONT LEGS", 9, anchor="start", fill="#7f8f99", weight=700))
     out.append(text(1160, 748, "REAR LEGS", 9, anchor="start", fill="#7f8f99", weight=700))
     return out, meta

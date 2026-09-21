@@ -47,4 +47,4 @@ def servo_xy(ch):
 
 
 # Servos plugged in on the bench today, by channel. The rest are drawn ghosted in the current view.
-BENCH_SERVOS = {0: "replacement servo, horn off, centred at 1500us in session 7"}
+BENCH_SERVOS = {ch: f"{name} servo" for name, ch in SERVOS}  # all twelve since session 12

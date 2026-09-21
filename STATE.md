@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-09-21, session 11.
+**Last updated:** 2026-09-21, session 12.
 
 ---
 
@@ -171,7 +171,9 @@ USB with the XT60 unplugged, then unplug USB before connecting the pack.
 **Bus bars.** Seven free positions on the red bar, two on the black bar since the relay's wires came
 off.
 
-**Not wired yet:** the twelve servos on the robot; channel 0 holds the bench test servo. The voltage sensor is not mounted at all.
+**All twelve servos are on their real channels** — session 12, checked with `code/channel_check`:
+none swapped, none buzzing, V+ 6.0V and the red bar 5.0V with all twelve holding. The robot sits on a
+box beside the bench; the electronics have not moved into it yet. The voltage sensor is not mounted at all.
 
 **Firmware.** An I2C scanner in session 4, `relay_off_on_safe` in session 5, `servo_center` in
 session 7 (Adafruit PWM Servo Driver Library 3.0.3). That sketch
@@ -199,24 +201,23 @@ not by a document.
 
 ---
 
-## Next session — Session 12: twelve servos on their channels
+## Next session — Session 13: Leika, built and flashed
 
-Electrical, on the bench, robot on its box. **The pack must be balance-charged first** — twelve servos
-powered together draw far more than one.
+The firmware at last. Software only: nothing on the bench changes, and the robot stays on its box.
 
-- [ ] Plug every servo into its real channel: front left 0/1/2, front right 3/4/5, rear left 6/7/8,
-      rear right 9/10/11, shoulder / upper leg / wrist. Extensions on the lower legs.
-- [ ] A sketch that moves **one channel at a time** a little around its mounting angle, so each joint
-      is seen answering on the right channel before anything moves together.
-- [ ] Measure the 6V rail and the red bar with all twelve holding.
-- [ ] Update `current-power-&-wiring-connections.md` and `docs/wiring/`, write
-      `main-steps/12-twelve-servos.md`, update this file, one commit.
+- [ ] Install PlatformIO, clone Leika with its submodules, pick `[env:esp32dev]`, and read its
+      `features.ini`: PCA9685 on, MPU6050 on, everything else off for now.
+- [ ] Build and flash the firmware and the filesystem image, on USB with the XT60 unplugged.
+- [ ] Reach its web app from a phone and see the servo page. **Do not calibrate or stand yet.**
+- [ ] Write `main-steps/13-leika.md`, update this file, one commit.
+
+Calibration comes after, on a stand, still with the robot carrying no weight.
 
 ---
 
 ## Backlog — ordered, one per session, never two in the same evening
 
-1. **All twelve servos on the PCA9685** (session 11), on michaelkubina's channel map: front left 0/1/2, front right
+1. ~~**All twelve servos on the PCA9685**~~ — done in session 12, on michaelkubina's channel map: front left 0/1/2, front right
    3/4/5, rear left 6/7/8, rear right 9/10/11, in the order shoulder, upper leg, lower leg. The
    replacement servos arrived on 2026-08-27, so nothing waits on delivery any more. An extension
    cable is on hand for every servo; the lower legs need them.
