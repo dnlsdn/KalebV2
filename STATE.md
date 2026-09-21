@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-09-21, session 12.
+**Last updated:** 2026-09-21, session 13 started.
 
 ---
 
@@ -201,17 +201,27 @@ not by a document.
 
 ---
 
-## Next session — Session 13: Leika, built and flashed
+## Next session — Session 13, continued: Leika, built and flashed
 
-The firmware at last. Software only: nothing on the bench changes, and the robot stays on its box.
+**Started on 2026-09-21, computer side only.** Done so far:
 
-- [ ] Install PlatformIO, clone Leika with its submodules, pick `[env:esp32dev]`, and read its
-      `features.ini`: PCA9685 on, MPU6050 on, everything else off for now.
-- [ ] Build and flash the firmware and the filesystem image, on USB with the XT60 unplugged.
-- [ ] Reach its web app from a phone and see the servo page. **Do not calibrate or stand yet.**
+- [x] PlatformIO IDE is installed in VS Code.
+- [x] Leika cloned to `~/Library/Developer/SpotMicroESP32-Leika` (upstream `9ccb0ff`, 2026-08-19),
+      on a local branch `kalebv2` with three changes: `esp32dev` as the board, MPU6050 on and WS2812
+      off, I2C at 400kHz because the MPU6050 cannot go faster. What and why: `firmware/leika-config.md`.
+
+Still to do:
+
+- [ ] Open the Leika folder in VS Code, let PlatformIO install its core, then **Build** `esp32dev`.
+      Needs only the computer. If it fails, keep the last 40 lines of the output.
+- [ ] With the ESP32, on USB, **XT60 unplugged**: **Upload Filesystem Image** once, then
+      **Upload and Monitor**. The serial monitor shows Leika booting.
+- [ ] Phone on the `Spot-Micro` Wi-Fi (password `spot-leika`), open `http://192.168.4.1`, and check
+      that Leika sees the PCA9685 and the MPU6050. **No calibration, no standing.**
 - [ ] Write `main-steps/13-leika.md`, update this file, one commit.
 
-Calibration comes after, on a stand, still with the robot carrying no weight.
+The pack was put to **Storage (3.8V per cell)** on 2026-09-21 before a five-day break: **balance-charge
+it** before any session that powers the servos.
 
 ---
 
