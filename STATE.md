@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-09-21, session 13: computer side done, bench side next.
+**Last updated:** 2026-10-03, session 13 closed: Leika runs on the robot's ESP32 and answers from a phone.
 
 ---
 
@@ -179,6 +179,17 @@ box beside the bench; the electronics have not moved into it yet. The voltage se
 session 7 (Adafruit PWM Servo Driver Library 3.0.3). That sketch
 has no job since the relay was removed and stays in `code/` only as a record.
 
+**Leika is on the ESP32** — session 13, 2026-10-03, with six changes to upstream, all in
+`firmware/leika-config.md`. It boots, opens the `Spot-Micro` access point, serves its app at
+`http://192.168.4.1`, finds the PCA9685 at 0x40 and the IMU at 0x68 from the app's I2C page, and the
+IMU chart follows the board when it is tilted. The servos have not been driven by Leika yet. Flashing
+is done: from now on the ESP32 can run from the pack with no USB, and the phone talks to it over Wi-Fi.
+
+**The IMU is an MPU6500, not an MPU6050.** It answers `WHO_AM_I` 0x70. Leika's MPU6050 driver loads its
+DMP and reads it correctly once 0x70 is accepted. It is wired with Dupont only and hangs from its wires
+on the bench, and it failed to answer at boot (`I2C hardware timeout`) on two of seven boots while the
+PCA9685 on the same bus never did.
+
 ---
 
 ## Pinout — reconciled in session 3
@@ -201,28 +212,32 @@ not by a document.
 
 ---
 
-## Next session — Session 13, continued: Leika, built and flashed
+## Next session — Session 14: servo calibration in Leika
 
-**Started on 2026-09-21, computer side only.** Done so far:
+**Is it worth doing?** Yes, and nothing cheaper comes first. Leika will not stand or walk on numbers it
+has not measured, and the 25MHz-vs-27MHz oscillator question is answered by this step, not by more
+desk work. Reinforcing the PCA9685 traces can wait: calibration moves free legs, the same light load
+as session 12.
 
-- [x] PlatformIO IDE is installed in VS Code.
-- [x] Leika cloned to `~/Library/Developer/SpotMicroESP32-Leika` (upstream `9ccb0ff`, 2026-08-19),
-      on a local branch `kalebv2` with three changes: `esp32dev` as the board, MPU6050 on and WS2812
-      off, I2C at 400kHz because the MPU6050 cannot go faster. What and why: `firmware/leika-config.md`.
+**Leika's own procedure has two traps for a robot already assembled** (`docs/2_assembly.md` in the
+clone). Its "Calibrate" button sends **all twelve servos to their centre at once** — the wrists are
+mounted at 0° and 180°, so they swing about 90° together. Its min/max search drives a servo **to the
+ends of its travel**, which with the horn on a leg can mean into the chassis. The same page says that
+if the servos are all the same kind, one can be calibrated and the values copied to the others.
 
-Still to do:
+So the proposal, a design judgement rather than a rule:
 
-- [x] **Build** `esp32dev` — succeeds, Flash 91.0% with the web app embedded. The first build had
-      silently left the app out for lack of `protoc`; how to spot and fix it is in
-      `firmware/leika-config.md`, with a desk check of what Leika will send to each servo.
-- [ ] With the ESP32, on USB, **XT60 unplugged**: **Upload Filesystem Image** once, then
-      **Upload and Monitor**. The serial monitor shows Leika booting.
-- [ ] Phone on the `Spot-Micro` Wi-Fi (password `spot-leika`), open `http://192.168.4.1`, and check
-      that Leika sees the PCA9685 and the MPU6050. **No calibration, no standing.**
-- [ ] Write `main-steps/13-leika.md`, update this file, one commit.
+- [ ] Balance-charge the pack (it is at Storage since 2026-09-21).
+- [ ] **Calibrate on a spare MG996R**, off the robot, plugged into a free channel or into the channel of
+      a joint whose servo is unplugged for the session: min PWM, max PWM, degrees per PWM step, from
+      `peripherals/servo`. Copy the values to all twelve.
+- [ ] Only then, robot lifted on its support, legs free, pack in, ESP32 **not** on USB: per-joint
+      offsets in the body frame, one joint at a time.
+- [ ] Write `main-steps/14-calibration.md`, update this file, one commit.
 
-The pack was put to **Storage (3.8V per cell)** on 2026-09-21 before a five-day break: **balance-charge
-it** before any session that powers the servos.
+Before the session, read Leika's calibration discussion (#118, linked from `docs/2_assembly.md`) to
+check what "Calibrate" does with joints mounted off-centre, and whether the app can move one servo
+without moving the others.
 
 ---
 
@@ -235,8 +250,8 @@ it** before any session that powers the servos.
 2. **Reinforce the PCA9685's V+ and GND traces with solder.** Leika's own documentation recommends
    it, and those traces are the narrowest point of the whole servo power path — narrower than the
    AWG16 feeding them. Before the robot carries its own weight.
-3. **Leika: build and flash.** PlatformIO, submodules, filesystem image. Calibrate all twelve
-   channels. With no relay, Leika runs unmodified.
+3. ~~**Leika: build and flash.**~~ Done in session 13, with six changes to upstream. **Calibration of the
+   twelve channels** is the next session.
 4. **Mount the main switch** on battery +, between the XT60 and the fuse. Owned already. With no
    relay it is the only servo power control, so check its DC current rating first.
 5. **Legs onto the chassis, first steps.**
@@ -247,7 +262,8 @@ dividers, ESP32-CAM, OLED.
 Chassis printing is passive time and runs in parallel, but **mechanical assembly never shares a
 session with wiring**.
 
-Before the robot ever walks, the Dupont connections have to be secured. They hold by friction alone
+Before the robot ever walks, the Dupont connections have to be secured — and the **IMU's four wires
+first**: they are the only ones that have already failed intermittently, in session 13. They hold by friction alone
 and vibration works them loose, which shows up as a firmware bug that is not a firmware bug. Hot
 glue on the housings or crimped connectors.
 
@@ -260,6 +276,15 @@ every wire after closing the lever.
 ---
 
 ## Open questions — answer before they cost something
+
+- **Does the IMU read level when it is level?** At rest on the bench it reads about 2 rad (~115°) on x
+  and y, but it was standing almost on its edge, so that may be correct. Check once it is screwed flat
+  on the circuitry plate. Note Leika's IMU chart is labelled in degrees and plots radians.
+- **Is the MPU6500 a full substitute?** Its accelerometer offset registers start at **0x77**
+  (XA_OFFSET_H, 0x7A, 0x7D), the MPU6050's at **0x06**, and Leika's driver writes 0x06 during its start-up
+  calibration (`REG_XA_OFFS_H` in `mpu6050.h`). Checked against the MPU-6500 register map and the Linux
+  `inv_mpu6050` driver (`INV_MPU6500_REG_ACCEL_OFFSET 0x77`), not on the bench. The gyro offsets are at
+  0x13 on both. It only matters for IMU tuning, after it walks.
 
 - **Why did the two servos fail?** Probably overloaded during testing on the old wiring, the one
   scrapped in April for having known electrical mistakes. Treated as a one-off from a configuration
