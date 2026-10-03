@@ -35,6 +35,12 @@ MG996R with a horn on channel 0, a squared sheet under it, USB off and the ESP32
   squared to the grid, horn arm laid on a grid line, slider value noted; then the slider moved until
   the arm lay on the perpendicular line, a quarter turn.
 
+<img src="images/14-grid-method.svg" alt="Horn arm on a grid line at slider value a, then on the perpendicular line at slider value b: exactly 90 degrees apart" width="560">
+
+*Two marked points are not enough: how far the horn's hole travels on the paper depends on how far it
+sits from the shaft. The arm's direction against the grid gives 90° with no protractor and no
+measurement of the arm.*
+
 | Arm on | Slider value |
 |---|---|
 | perpendicular line, one side | 130 |
@@ -56,6 +62,11 @@ turn about 158° across their range, but that link is an inference, not a measur
 **2.56 entered in the Conversion column of all twelve rows** of Leika's servo table, saved, and read
 back after reloading the page: every row shows 2.559999, the float nearest to 2.56. Center PWM (306),
 Center Angle and Direction were left at Leika's defaults.
+
+<img src="images/14-servo-table.png" alt="Leika's servo table on the phone after reloading: Conversion 2.559999 on all twelve rows, Center PWM 306" width="320">
+
+*The servo table read back from the ESP32 after a reload. Conversion is the only column changed; the
+others are the next session.*
 
 ## What I verified
 
