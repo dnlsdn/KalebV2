@@ -47,6 +47,11 @@ All debug lines were removed before the final build. The six changes are committ
 window; Safari on `http://192.168.4.1`, after choosing "Use without Internet", works as well. Brave did
 not. The app opened on the 3D model of the robot, mode **Deactivated**, which it stayed in.
 
+<img src="images/13-leika-app.png" alt="Leika's app on an iPhone: the 3D model of the robot, mode Deactivated" width="320">
+
+*Leika's app served by the robot's own ESP32, as the phone sees it. The bar at the bottom stays on
+Deactivated: nothing tonight asked the servos to move.*
+
 ## What I verified
 
 No multimeter readings this session: nothing on the power path changed, and the servo rail was off.
