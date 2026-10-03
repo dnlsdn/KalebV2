@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-10-03, session 13 closed: Leika runs on the robot's ESP32 and answers from a phone.
+**Last updated:** 2026-10-03, session 14 closed: servo conversion measured (2.56), body frame next.
 
 ---
 
@@ -190,6 +190,12 @@ DMP and reads it correctly once 0x70 is accepted. It is wired with Dupont only a
 on the bench, and it failed to answer at boot (`I2C hardware timeout`) on two of seven boots while the
 PCA9685 on the same bus never did.
 
+**Servo conversion measured** — session 14: **2.56 ticks per degree**, over 180° on a spare MG996R, against
+Leika's default 2.0. Entered for all twelve channels and stored on the ESP32 (`servoSettings.json`);
+uploading the filesystem image again would erase it, so it is also in `firmware/leika-config.md`.
+Center PWM, Center Angle and Direction are still Leika's defaults. **One of the two failed servos holds
+its position but does not follow commands**; it is labelled and stays out of the robot.
+
 ---
 
 ## Pinout — reconciled in session 3
@@ -212,32 +218,27 @@ not by a document.
 
 ---
 
-## Next session — Session 14: servo calibration in Leika
+## Next session — Session 15: body frame calibration
 
-**Is it worth doing?** Yes, and nothing cheaper comes first. Leika will not stand or walk on numbers it
-has not measured, and the 25MHz-vs-27MHz oscillator question is answered by this step, not by more
-desk work. Reinforcing the PCA9685 traces can wait: calibration moves free legs, the same light load
-as session 12.
+**Is it worth doing?** Yes, it is the last step before Leika can be asked to rest or stand. The
+conversion is now right for every servo; what is left is where each joint sits, which depends on how
+each horn was mounted and cannot be copied from one servo to another.
 
-**Leika's own procedure has two traps for a robot already assembled** (`docs/2_assembly.md` in the
-clone). Its "Calibrate" button sends **all twelve servos to their centre at once** — the wrists are
-mounted at 0° and 180°, so they swing about 90° together. Its min/max search drives a servo **to the
-ends of its travel**, which with the horn on a leg can mean into the chassis. The same page says that
-if the servos are all the same kind, one can be calibrated and the values copied to the others.
+**What it is.** In Leika's **Calibration** mode every leg should point straight down (its author, in
+discussion #118). Where a leg does not, its **Center PWM** or **Center Angle** in the servo table is
+adjusted until it does — one joint at a time.
 
-So the proposal, a design judgement rather than a rule:
-
-- [ ] Balance-charge the pack (it is at Storage since 2026-09-21).
-- [ ] **Calibrate on a spare MG996R**, off the robot, plugged into a free channel or into the channel of
-      a joint whose servo is unplugged for the session: min PWM, max PWM, degrees per PWM step, from
-      `peripherals/servo`. Copy the values to all twelve.
-- [ ] Only then, robot lifted on its support, legs free, pack in, ESP32 **not** on USB: per-joint
-      offsets in the body frame, one joint at a time.
-- [ ] Write `main-steps/14-calibration.md`, update this file, one commit.
-
-Before the session, read Leika's calibration discussion (#118, linked from `docs/2_assembly.md`) to
-check what "Calibrate" does with joints mounted off-centre, and whether the app can move one servo
-without moving the others.
+- [ ] **Desk check first, no hardware:** redo session 13's prediction of the activation pose with a
+      conversion of 2.56 instead of 2.0, and check that no joint is sent past its travel or into the
+      chassis. Also check what Calibration mode sends, since a user in #118 saw it move in several
+      steps.
+- [ ] Pack charged; robot **lifted on its support, legs free**; ESP32 on the pack, **no USB**.
+- [ ] First activation: watch for a leg that moves the wrong way or a joint on the wrong channel —
+      the servos were re-plugged by label in session 14 and not checked since.
+- [ ] Calibration mode; adjust each joint until its leg points straight down; read the values back after
+      reloading the page.
+- [ ] Record all twelve rows in `firmware/leika-config.md`, write `main-steps/15-body-frame.md`, update
+      this file, one commit.
 
 ---
 
@@ -250,8 +251,8 @@ without moving the others.
 2. **Reinforce the PCA9685's V+ and GND traces with solder.** Leika's own documentation recommends
    it, and those traces are the narrowest point of the whole servo power path — narrower than the
    AWG16 feeding them. Before the robot carries its own weight.
-3. ~~**Leika: build and flash.**~~ Done in session 13, with six changes to upstream. **Calibration of the
-   twelve channels** is the next session.
+3. ~~**Leika: build and flash.**~~ Done in session 13, with six changes to upstream. Calibration: the
+   servo frame (conversion) done in session 14, **the body frame is the next session**.
 4. **Mount the main switch** on battery +, between the XT60 and the fuse. Owned already. With no
    relay it is the only servo power control, so check its DC current rating first.
 5. **Legs onto the chassis, first steps.**

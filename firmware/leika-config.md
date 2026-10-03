@@ -132,6 +132,17 @@ is a prediction to check on the bench, not a measurement.
   100-120µs longer: centre at ~1616µs instead of ~1496µs. Leika's per-channel calibration absorbs it,
   which is one more reason not to skip calibration.
 
+## Settings stored on the ESP32, not in the code
+
+Leika keeps calibration in its filesystem, as `servoSettings.json`. **Uploading the filesystem image
+again erases it**, so every value set from the app is also recorded here.
+
+| Setting | Value | Set in | How it was found |
+|---|---|---|---|
+| Conversion, all twelve servos | **2.56** ticks per degree (Leika's default 2.0) | session 14 | measured over 180° on a spare MG996R, `main-steps/14-servo-conversion.md` |
+| Center PWM | 306, default | — | next session, per joint |
+| Center Angle, Direction | defaults | — | next session, per joint |
+
 ## Reaching it from a phone
 
 - The robot's network has no internet, so **iOS treats it like a hotel Wi-Fi**: it opens a small
