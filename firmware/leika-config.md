@@ -6,13 +6,16 @@ It is **not vendored here**. It lives next to this repo:
 - **Clone:** `~/Library/Developer/SpotMicroESP32-Leika`, with its `nanopb` submodule
   (`git clone --recurse-submodules`).
 - **Based on:** upstream `9ccb0ff`, 2026-08-19.
-- **Local branch:** `kalebv2`, two commits on top (`d071f83`, `fd7120f`). It is not pushed anywhere, so
-  the full diff is below: if the clone is lost or Leika is updated, reapply these six changes by hand.
+- **Local branch:** `kalebv2`, three commits on top (`d071f83`, `fd7120f`, `b3ec8ae`). It is not pushed
+  anywhere, so the full diff is below: if the clone is lost or Leika is updated, reapply these eight
+  changes by hand.
 
-## The six changes, and why
+## The eight changes, and why
 
-The first three were made at the desk on 2026-09-21. The last three were forced by the first flash on
-2026-10-03: without them Leika does not boot on this board, and once it boots nobody can reach it.
+The first three were made at the desk on 2026-09-21. The next three were forced by the first flash on
+2026-10-03: without them Leika does not boot on this board, and once it boots nobody can reach it. The
+last two came on 2026-10-04: a race on the I2C bus found in session 16, and the calibration written into
+the firmware after the board that held it was lost.
 
 | File | Change | Why |
 |---|---|---|
@@ -22,6 +25,8 @@ The first three were made at the desk on 2026-09-21. The last three were forced 
 | `esp32/sdkconfig.defaults.esp32dev` (new), and `board_build.cmake_extra_args` in `[env:esp32dev]` | PSRAM off, flash 4MB, for this env only | The shared `sdkconfig.defaults` turns **PSRAM** on for every board. This ESP32-D0WD-V3 has none, so the firmware stopped at `PSRAM chip not found` and reset in a loop. Setting it in an env-only file leaves the camera boards, which do have PSRAM, as they were. The file matches a `sdkconfig.*` rule in Leika's `.gitignore`, so it was committed with `git add -f`. |
 | `esp32/include/peripherals/drivers/mpu6050.h` | accept `WHO_AM_I` **0x70** | The sensor sold as an MPU6050 answers 0x70: it is an **MPU6500**, common on cheap GY-521 boards. Leika accepted only 0x68 and 0x72 and gave up. With 0x70 accepted the DMP loads, calibrates and follows tilt. |
 | `esp32/src/wifi/wifi_idf.cpp` | `getMode()` returns the mode the class started | A Leika bug, not this hardware. Before the radio is started the Wi-Fi driver reports **AP**, its default; `APService` read that, believed the access point was up, and never started it. The class already records the real mode in `_mode`; returning it fixes the access point. |
+| `esp32/include/peripherals/i2c_bus.h` | a recursive mutex around every transaction | A Leika bug. The control task and the WebSocket handlers both use the bus, and `ensureDevice()` deletes and re-creates the one device handle whenever the address changes. Moving the Servo page's PWM slider raced the IMU reads: 21 *Wrong I2C status, cannot delete device* in 109 slider moves, 0 in 812 after. Session 16. |
+| `esp32/include/peripherals/servo_controller.h` | defaults: conversion 2.56 and the twelve measured Center PWMs | Leika keeps calibration in the board's filesystem, which went with the board lost in session 16. Leika falls back to these defaults whenever no servo settings file exists, so a new board or an erased filesystem starts calibrated. Direction and Center Angle are upstream's. |
 
 ```diff
 --- a/esp32/features.ini
@@ -135,7 +140,9 @@ is a prediction to check on the bench, not a measurement.
 ## Settings stored on the ESP32, not in the code
 
 Leika keeps calibration in its filesystem, as `servoSettings.json`. **Uploading the filesystem image
-again erases it**, so every value set from the app is also recorded here.
+again erases it**, and a new board starts without it. Since session 16 the values below are also the
+firmware's defaults (eighth change), so both cases fall back to them. Any value changed later from the
+app lives only on the board until it is copied here and into `servo_controller.h`.
 
 | Setting | Value | Set in | How it was found |
 |---|---|---|---|

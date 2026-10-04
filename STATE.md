@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-10-04, session 15 closed: all twelve joints calibrated; brown-out resets found, next.
+**Last updated:** 2026-10-04, session 16 closed: I2C race fixed, ESP32 lost to a probe slip, replacement next.
 
 ---
 
@@ -202,7 +202,16 @@ Leika's default, up to 23°. Center Angle and Direction are Leika's defaults. No
 through Leika's kinematics yet.
 
 **The ESP32 resets from brown-out when servos move** — session 15, Leika's System Status: *Reset Reason:
-Brownout reset*. Seen with three servos moved one at a time. The cause is not known yet.
+Brownout reset*. Seen with three servos moved one at a time. Still not explained after session 16.
+
+**The ESP32 is lost and out of the robot** — session 16. Its 3.3V died while a VIN reading was taken with
+both probes on its header. The five wires to put back, by colour, are in
+`current-power-&-wiring-connections.md`. The replacement is an ESP-WROOM-32 / CP2102 board, 30 pins.
+**The PCA9685 and the IMU were on its 3.3V and have not been checked since.**
+
+**Leika has eight changes now** — session 16 added a lock on the I2C bus (a real race: 21 errors in 109
+slider moves, 0 in 812 after) and wrote the calibration in as the firmware's defaults, so the new board
+starts calibrated.
 
 **Deactivating does not relax the servos.** With Active off and the PCA9685 asleep, a leg stayed stiff.
 STOP and Deactivated are not a safe state; unplugging the XT60 is.
@@ -229,27 +238,22 @@ not by a document.
 
 ---
 
-## Next session — Session 16: brown-out resets
+## Next session — Session 17: the new ESP32
 
-**Is it worth doing?** Yes, and before anything else. Rest, Stand and walking draw far more current
-than three servos moved one at a time, and a reset mid-step drops the robot with its weight on the
-legs. Nothing on the path to walking can be tested while the logic supply collapses.
+**Is it worth doing?** It is not optional: nothing moves without it. Keep it to getting back to where
+session 15 ended, then resume the brown-out search on top of a known-good board.
 
-**What is known.** Leika's System Status reported *Brownout reset* after the connection dropped during
-servo moves (session 15). The servo rail and the logic rail come from two separate step-downs, so the
-servos should not pull the 5V rail down directly. Candidates, cheapest to check first:
-
-1. **The Dupont wire into the ESP32's VIN.** Thin and held by friction: every current peak drops
-   voltage across it.
-2. **The ESP32's own Wi-Fi peaks**, up to about half an ampere for milliseconds while transmitting.
-3. **Noise on the shared ground** from the servos, through the star point.
-
-- [ ] Pack charged; robot lifted; all twelve servos plugged in by label (re-plugged after session 15).
-- [ ] Reproduce it and read **Reset Reason** in System Status after each drop. Note what moved.
-- [ ] Multimeter between ESP32 **VIN and GND at the board's own pins**, then at the bus bars, while a
-      servo moves: a difference between the two is the Dupont.
-- [ ] Only then pick a fix from what was measured — the spare 1000µF 16V capacitor is on hand.
-- [ ] Write `main-steps/16-brownout.md`, update this file, one commit.
+- [ ] **On USB alone, nothing else wired:** Upload Filesystem Image, then Upload and Monitor. The serial
+      log shows Leika booting, `Spot-Micro` appearing, and **no** `PSRAM` abort.
+- [ ] Servo page: the table should show **2.56** and the twelve Center PWMs without typing them — the
+      firmware defaults. If it shows 306 and 2.0, the defaults did not apply.
+- [ ] USB unplugged, the five Duponts back by colour (`current-power-&-wiring-connections.md`), tug-test.
+- [ ] USB alone again: I2C page shows **0x40 and 0x68**. If either is missing, that board did not
+      survive session 16.
+- [ ] Then, with the pack: resume session 16's plan — Reset Reason after each test, Wi-Fi only first,
+      then one leg moving.
+- [ ] Measure **black probe on the black bus bar, red probe on one pin**. Never two probes on a header.
+- [ ] Write `main-steps/17-new-esp32.md`, update this file, one commit.
 
 ---
 
@@ -263,8 +267,8 @@ servos should not pull the 5V rail down directly. Candidates, cheapest to check 
    it, and those traces are the narrowest point of the whole servo power path — narrower than the
    AWG16 feeding them. Before the robot carries its own weight.
 3. ~~**Leika: build and flash.**~~ Done in session 13, with six changes to upstream. Calibration: the
-   servo frame (conversion) done in session 14, body frame in session 15. **Brown-out resets first**,
-   then Rest with the robot lifted.
+   servo frame (conversion) done in session 14, body frame in session 15. **New ESP32 and brown-out
+   resets first** (sessions 16-17), then Rest with the robot lifted.
 4. **Mount the main switch** on battery +, between the XT60 and the fuse. Owned already. With no
    relay it is the only servo power control, so check its DC current rating first.
 5. **Legs onto the chassis, first steps.**
@@ -324,6 +328,8 @@ every wire after closing the lever.
   switch. Unplug the pack before touching anything on the servo side.
 - Servo power is only ever switched with the servos idle — never under load.
 - **STOP and Deactivated do not make the servos limp** (session 15). Only unplugging the XT60 does.
+- **Multimeter: black probe on the black bus bar, red probe on one pin.** Never both probes on a board's
+  header pins: in session 16 a slip there cost the ESP32.
 - No firmware touches the ultrasonic sensors until the ECHO dividers are in place.
 - Every voltage claim in a session log is a multimeter reading, not an assumption.
 
