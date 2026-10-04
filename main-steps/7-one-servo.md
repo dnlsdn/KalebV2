@@ -33,6 +33,11 @@ pack. The sketch runs from flash.
 - Unplugged USB, plugged the servo into channel 0 (brown GND, red V+, orange PWM), connected the XT60.
   The servo moved once to its centre and held.
 
+<img src="images/07-servo-pulse.svg" alt="The PCA9685 output: a 1500 microsecond pulse every 20 milliseconds; the pulse width sets the horn angle, about 544 microseconds for 0 degrees, 1500 for the centre, about 2400 for 180 degrees" width="560">
+
+*What channel 0 sends. The servo reads only the width of each pulse; 1500µs is the middle of its
+travel.*
+
 **The oscillator question, and why it did not matter.** The sketch assumes the PCA9685's nominal
 25MHz; real boards run anywhere from 23 to 27MHz, so "1500µs" can land some tens of microseconds off.
 Measuring it was considered and dropped: the MG996R spline has 25 teeth, so a horn can only be seated

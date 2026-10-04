@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="310" viewBox="0 0 680 310" font-family="Helvetica, Arial, sans-serif">
+<title>Servo signal: one pulse every 20ms, and the pulse width sets the horn angle</title>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text x="40" y="36" font-size="12" fill="#888780" font-weight="bold">PCA9685 channel 0 — sent once by the sketch, repeated by the chip on its own</text>
+<path d="M30 110 L40 110 L40 60 L61 60 L61 110 L320 110 L320 60 L341 60 L341 110 L600 110 L600 60 L621 60 L621 110 L650 110" fill="none" stroke="#185FA5" stroke-width="2"/>
+<text x="70" y="76" font-size="12" fill="#888780">← 1500 µs high: the width is the position</text>
+<line x1="42" y1="132" x2="318" y2="132" stroke="#888780" stroke-width="1" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+<text x="180" y="150" font-size="12" fill="#888780" text-anchor="middle">20 ms between pulses (50 Hz)</text>
+<text x="340" y="194" font-size="12" fill="#888780" text-anchor="middle">pulse width → horn angle (Arduino Servo scale)</text>
+<g fill="none" stroke="#888780" stroke-width="1.5">
+<path d="M110 255 A40 40 0 0 1 190 255"/>
+<path d="M300 255 A40 40 0 0 1 380 255"/>
+<path d="M490 255 A40 40 0 0 1 570 255"/>
+</g>
+<g stroke="#185FA5" stroke-width="4" stroke-linecap="round">
+<line x1="150" y1="255" x2="116" y2="255"/>
+<line x1="340" y1="255" x2="340" y2="221"/>
+<line x1="530" y1="255" x2="564" y2="255"/>
+</g>
+<g fill="#5F5E5A"><circle cx="150" cy="255" r="5"/><circle cx="340" cy="255" r="5"/><circle cx="530" cy="255" r="5"/></g>
+<g font-size="12" fill="#888780" text-anchor="middle">
+<text x="150" y="285">about 544 µs → 0°</text>
+<text x="340" y="285">1500 µs → centre</text>
+<text x="530" y="285">about 2400 µs → 180°</text>
+</g>
+</svg>

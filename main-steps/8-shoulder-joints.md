@@ -24,6 +24,10 @@ The wrists were done that way in November 2025 (`Step_1-Wrist-Calibration-and-As
 git history). `STATE.md` claimed "ten of the twelve servos were centered at 1500µs", which was wrong
 and is corrected there now.
 
+<img src="images/08-channel-map.svg" alt="Top view of the robot with the four legs, their PCA9685 channels 0 to 11 and the mounting angle of each joint" width="560">
+
+*The same angles on michaelkubina's channel map, which the leg labels have to follow.*
+
 Leika's own defaults agree with this geometry: at the servo centre it expects the shoulder neutral,
 the upper leg about 45° off and the knee bent 90°, and it calibrates the remainder per channel in
 software.
@@ -70,4 +74,6 @@ mechanical step settles it.
   michaelkubina's — front left 0/1/2, front right 3/4/5, rear left 6/7/8, rear right 9/10/11 —
   before anything is wired.
 
-<img width="482" height="656" alt="image" src="https://github.com/user-attachments/assets/63946c58-df6f-4bc9-9514-6bcb49919129" />
+<img src="images/08-shoulder-joints.jpg" alt="The four legs on the floor, each with its shoulder joint and shoulder servo fitted" width="420">
+
+*The four legs at the end of the session, shoulder joints fitted.*
