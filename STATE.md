@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-10-03, session 14 closed: servo conversion measured (2.56), body frame next.
+**Last updated:** 2026-10-04, session 15 closed: all twelve joints calibrated; brown-out resets found, next.
 
 ---
 
@@ -193,8 +193,19 @@ PCA9685 on the same bus never did.
 **Servo conversion measured** — session 14: **2.56 ticks per degree**, over 180° on a spare MG996R, against
 Leika's default 2.0. Entered for all twelve channels and stored on the ESP32 (`servoSettings.json`);
 uploading the filesystem image again would erase it, so it is also in `firmware/leika-config.md`.
-Center PWM, Center Angle and Direction are still Leika's defaults. **One of the two failed servos holds
-its position but does not follow commands**; it is labelled and stays out of the robot.
+**One of the two failed servos holds its position but does not follow commands**; it is labelled and
+stays out of the robot.
+
+**All twelve joints calibrated** — session 15: Center PWM per joint, measured one leg at a time at
+knee 90° and foot under the hip; values in `firmware/leika-config.md`. Nine of twelve were 4° or more off
+Leika's default, up to 23°. Center Angle and Direction are Leika's defaults. No pose has been commanded
+through Leika's kinematics yet.
+
+**The ESP32 resets from brown-out when servos move** — session 15, Leika's System Status: *Reset Reason:
+Brownout reset*. Seen with three servos moved one at a time. The cause is not known yet.
+
+**Deactivating does not relax the servos.** With Active off and the PCA9685 asleep, a leg stayed stiff.
+STOP and Deactivated are not a safe state; unplugging the XT60 is.
 
 ---
 
@@ -218,27 +229,27 @@ not by a document.
 
 ---
 
-## Next session — Session 15: body frame calibration
+## Next session — Session 16: brown-out resets
 
-**Is it worth doing?** Yes, it is the last step before Leika can be asked to rest or stand. The
-conversion is now right for every servo; what is left is where each joint sits, which depends on how
-each horn was mounted and cannot be copied from one servo to another.
+**Is it worth doing?** Yes, and before anything else. Rest, Stand and walking draw far more current
+than three servos moved one at a time, and a reset mid-step drops the robot with its weight on the
+legs. Nothing on the path to walking can be tested while the logic supply collapses.
 
-**What it is.** In Leika's **Calibration** mode every leg should point straight down (its author, in
-discussion #118). Where a leg does not, its **Center PWM** or **Center Angle** in the servo table is
-adjusted until it does — one joint at a time.
+**What is known.** Leika's System Status reported *Brownout reset* after the connection dropped during
+servo moves (session 15). The servo rail and the logic rail come from two separate step-downs, so the
+servos should not pull the 5V rail down directly. Candidates, cheapest to check first:
 
-- [ ] **Desk check first, no hardware:** redo session 13's prediction of the activation pose with a
-      conversion of 2.56 instead of 2.0, and check that no joint is sent past its travel or into the
-      chassis. Also check what Calibration mode sends, since a user in #118 saw it move in several
-      steps.
-- [ ] Pack charged; robot **lifted on its support, legs free**; ESP32 on the pack, **no USB**.
-- [ ] First activation: watch for a leg that moves the wrong way or a joint on the wrong channel —
-      the servos were re-plugged by label in session 14 and not checked since.
-- [ ] Calibration mode; adjust each joint until its leg points straight down; read the values back after
-      reloading the page.
-- [ ] Record all twelve rows in `firmware/leika-config.md`, write `main-steps/15-body-frame.md`, update
-      this file, one commit.
+1. **The Dupont wire into the ESP32's VIN.** Thin and held by friction: every current peak drops
+   voltage across it.
+2. **The ESP32's own Wi-Fi peaks**, up to about half an ampere for milliseconds while transmitting.
+3. **Noise on the shared ground** from the servos, through the star point.
+
+- [ ] Pack charged; robot lifted; all twelve servos plugged in by label (re-plugged after session 15).
+- [ ] Reproduce it and read **Reset Reason** in System Status after each drop. Note what moved.
+- [ ] Multimeter between ESP32 **VIN and GND at the board's own pins**, then at the bus bars, while a
+      servo moves: a difference between the two is the Dupont.
+- [ ] Only then pick a fix from what was measured — the spare 1000µF 16V capacitor is on hand.
+- [ ] Write `main-steps/16-brownout.md`, update this file, one commit.
 
 ---
 
@@ -252,7 +263,8 @@ adjusted until it does — one joint at a time.
    it, and those traces are the narrowest point of the whole servo power path — narrower than the
    AWG16 feeding them. Before the robot carries its own weight.
 3. ~~**Leika: build and flash.**~~ Done in session 13, with six changes to upstream. Calibration: the
-   servo frame (conversion) done in session 14, **the body frame is the next session**.
+   servo frame (conversion) done in session 14, body frame in session 15. **Brown-out resets first**,
+   then Rest with the robot lifted.
 4. **Mount the main switch** on battery +, between the XT60 and the fuse. Owned already. With no
    relay it is the only servo power control, so check its DC current rating first.
 5. **Legs onto the chassis, first steps.**
@@ -311,6 +323,7 @@ every wire after closing the lever.
 - **A connected pack means live servos.** The servo rail follows the XT60, and later the main
   switch. Unplug the pack before touching anything on the servo side.
 - Servo power is only ever switched with the servos idle — never under load.
+- **STOP and Deactivated do not make the servos limp** (session 15). Only unplugging the XT60 does.
 - No firmware touches the ultrasonic sensors until the ECHO dividers are in place.
 - Every voltage claim in a session log is a multimeter reading, not an assumption.
 

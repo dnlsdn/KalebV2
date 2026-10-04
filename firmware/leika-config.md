@@ -140,8 +140,8 @@ again erases it**, so every value set from the app is also recorded here.
 | Setting | Value | Set in | How it was found |
 |---|---|---|---|
 | Conversion, all twelve servos | **2.56** ticks per degree (Leika's default 2.0) | session 14 | measured over 180° on a spare MG996R, `main-steps/14-servo-conversion.md` |
-| Center PWM | 306, default | — | next session, per joint |
-| Center Angle, Direction | defaults | — | next session, per joint |
+| Center PWM, ch 0-11 | **306, 322, 338, 298, 261, 315, 286, 349, 308, 266, 306, 247** | session 15 | per joint, at knee 90° and foot under the hip, `main-steps/15-body-frame.md` |
+| Center Angle, Direction | Leika's defaults, unchanged | — | — |
 
 ## Reaching it from a phone
 
@@ -154,6 +154,13 @@ again erases it**, so every value set from the app is also recorded here.
   robot is not on, not the link to the phone.
 - **Pages that ask the robot for data show an empty result while they wait.** "No I2C devices found"
   with a spinning button means no answer yet, not no devices.
+- **System Status shows Uptime wrong.** The firmware sends milliseconds (`esp_timer_get_time() / 1000`
+  in `system_service.cpp`) and the app formats them as seconds: "1 day 7 hours" was 113 seconds. Reset
+  Reason on the same page is right, and is how a brown-out was found in session 15.
+- **Calibration mode turns the servos off** in this version, contrary to the documentation and
+  discussion #118. Calibration is done from the Servo page instead: **Active** sends every connected
+  servo to the angles in memory (all zero at boot, legs straight), the PWM slider moves one channel, and
+  **Set center pwm** stores the slider's value for the selected servo.
 - **The IMU chart says degrees and plots radians.** The driver's `atan2` returns radians and the app
   does not convert them: ±3.14 is ±180°, and a line jumping from +3 to −3 is the angle wrapping
   around, not noise.
