@@ -94,6 +94,23 @@ Verified in session 6, no servo attached:
 
 ---
 
+## ESP32 — out of the robot since session 16
+
+The board was lost in session 16 (`main-steps/16-resets.md`) and removed. Its five Duponts, to put
+back on the replacement:
+
+| Wire | From | ESP32 pin |
+|---|---|---|
+| red | red bus bar, 5V | VIN (5V) |
+| red | 3.3V WAGO | 3V3 |
+| black | black bus bar | GND |
+| yellow | SDA WAGO | GPIO21 |
+| orange | SCL WAGO | GPIO22 |
+
+The replacement is an ESP-WROOM-32 board with a CP2102 and 30 pins; its labels may read D21 and D22.
+
+---
+
 ## Red bus bar — 5V logic
 
 All four verified by continuity against the bar. Seven of its twelve positions are free.
