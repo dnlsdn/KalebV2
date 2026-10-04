@@ -55,4 +55,6 @@ reason.
 - **Moving the electronics in**: which way round the mounting plate goes, and whether the two 12-screw
   bus bars fit on it at all.
 
-<img width="823" height="658" alt="image" src="https://github.com/user-attachments/assets/b188c35b-94b0-4e0f-a2f3-c3c2fe4fa764" />
+<img src="images/10-legs-on-body.jpg" alt="The chassis with both leg groups bolted on, resting on a box, with the electronics still spread out on the bench" width="560">
+
+*The legs on the body, resting on a box. The electronics are still on the bench.*

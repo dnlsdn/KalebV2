@@ -27,6 +27,10 @@ full than the half its resting voltage suggested. Recorded in `STATE.md` with th
   back, and pauses four seconds before starting again from ch0.
 - Robot on a box beside the bench, legs hanging free, pack as the only supply.
 
+<img src="images/08-channel-map.svg" alt="Top view of the robot with the four legs, their PCA9685 channels 0 to 11 and the mounting angle of each joint" width="560">
+
+*The map the sketch checks: channel and mounting angle for every joint, as set in session 8.*
+
 ## What I verified
 
 - **Every channel moved its own joint**, in the expected order, over several rounds. None swapped.

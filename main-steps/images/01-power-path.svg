@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="320" viewBox="0 0 680 320" font-family="Helvetica, Arial, sans-serif">
+<title>Session 1 power path: LiPo, fuse, ACS712, a WAGO split into the SZBK07 and the LM2596, and the 5V red bus bar</title>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect x="20" y="92" width="90" height="46" rx="6" fill="#FAC775" stroke="#854F0B" stroke-width="1"/>
+<text x="65" y="112" font-size="14" fill="#633806" text-anchor="middle" font-weight="bold">LiPo 2S</text>
+<text x="65" y="129" font-size="12" fill="#633806" text-anchor="middle">7.4V</text>
+<rect x="140" y="92" width="80" height="46" rx="6" fill="#D3D1C7" stroke="#5F5E5A" stroke-width="1"/>
+<text x="180" y="120" font-size="13" fill="#2C2C2A" text-anchor="middle">10A fuse</text>
+<rect x="250" y="92" width="90" height="46" rx="6" fill="#D3D1C7" stroke="#5F5E5A" stroke-width="1"/>
+<text x="295" y="112" font-size="13" fill="#2C2C2A" text-anchor="middle" font-weight="bold">ACS712</text>
+<text x="295" y="129" font-size="11" fill="#2C2C2A" text-anchor="middle">current sensor</text>
+<rect x="370" y="97" width="70" height="36" rx="6" fill="#FAC775" stroke="#854F0B" stroke-width="1"/>
+<text x="405" y="120" font-size="12" fill="#633806" text-anchor="middle">WAGO</text>
+<line x1="110" y1="115" x2="138" y2="115" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="220" y1="115" x2="248" y2="115" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="340" y1="115" x2="368" y2="115" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="490" y="40" width="170" height="50" rx="6" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+<text x="575" y="61" font-size="14" fill="#0C447C" text-anchor="middle" font-weight="bold">SZBK07 → 6.00V</text>
+<text x="575" y="79" font-size="11" fill="#0C447C" text-anchor="middle">servo rail, left open for now</text>
+<rect x="490" y="140" width="170" height="50" rx="6" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+<text x="575" y="161" font-size="14" fill="#0C447C" text-anchor="middle" font-weight="bold">LM2596 → 5.00V</text>
+<text x="575" y="179" font-size="11" fill="#0C447C" text-anchor="middle">logic rail</text>
+<line x1="440" y1="110" x2="488" y2="70" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="440" y1="120" x2="488" y2="160" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="200" y="232" width="460" height="28" rx="6" fill="#F7C1C1" stroke="#A32D2D" stroke-width="1"/>
+<text x="430" y="251" font-size="13" fill="#791F1F" text-anchor="middle" font-weight="bold">red bus bar · 5V logic rail</text>
+<line x1="575" y1="190" x2="575" y2="230" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="430" y="284" font-size="12" fill="#888780" text-anchor="middle">feeds ESP32 VIN · PCA9685 VCC · relay VCC · ACS712 VCC · both HC-SR04</text>
+<text x="430" y="304" font-size="12" fill="#888780" text-anchor="middle">every negative and every GND pin goes to the black bus bar, the ground star</text>
+</svg>

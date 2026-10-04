@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="400" viewBox="0 0 680 400" font-family="Helvetica, Arial, sans-serif">
+<title>PCA9685 channel map seen from above, with the mounting angle of every joint</title>
+<text x="340" y="38" font-size="12" fill="#888780" text-anchor="middle" font-weight="bold">head</text>
+<polygon points="340,48 326,72 354,72" fill="#D3D1C7" stroke="#5F5E5A" stroke-width="1"/>
+<rect x="285" y="80" width="110" height="240" rx="8" fill="#D3D1C7" stroke="#5F5E5A" stroke-width="1"/>
+<text x="340" y="205" font-size="13" fill="#2C2C2A" text-anchor="middle">body</text>
+<line x1="250" y1="120" x2="285" y2="120" stroke="#888780" stroke-width="1.5"/>
+<rect x="40" y="70" width="210" height="100" rx="6" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+<text x="54" y="94" font-size="13" fill="#0C447C" font-weight="bold">Front left</text>
+<text x="54" y="118" font-size="12" fill="#0C447C">ch 0</text>
+<text x="104" y="118" font-size="12" fill="#0C447C">shoulder</text>
+<text x="236" y="118" font-size="12" fill="#0C447C" text-anchor="end">90°</text>
+<text x="54" y="138" font-size="12" fill="#0C447C">ch 1</text>
+<text x="104" y="138" font-size="12" fill="#0C447C">upper leg</text>
+<text x="236" y="138" font-size="12" fill="#0C447C" text-anchor="end">120°</text>
+<text x="54" y="158" font-size="12" fill="#0C447C">ch 2</text>
+<text x="104" y="158" font-size="12" fill="#0C447C">wrist</text>
+<text x="236" y="158" font-size="12" fill="#0C447C" text-anchor="end">0°</text>
+<line x1="430" y1="120" x2="395" y2="120" stroke="#888780" stroke-width="1.5"/>
+<rect x="430" y="70" width="210" height="100" rx="6" fill="#FAC775" stroke="#854F0B" stroke-width="1"/>
+<text x="444" y="94" font-size="13" fill="#633806" font-weight="bold">Front right</text>
+<text x="444" y="118" font-size="12" fill="#633806">ch 3</text>
+<text x="494" y="118" font-size="12" fill="#633806">shoulder</text>
+<text x="626" y="118" font-size="12" fill="#633806" text-anchor="end">90°</text>
+<text x="444" y="138" font-size="12" fill="#633806">ch 4</text>
+<text x="494" y="138" font-size="12" fill="#633806">upper leg</text>
+<text x="626" y="138" font-size="12" fill="#633806" text-anchor="end">60°</text>
+<text x="444" y="158" font-size="12" fill="#633806">ch 5</text>
+<text x="494" y="158" font-size="12" fill="#633806">wrist</text>
+<text x="626" y="158" font-size="12" fill="#633806" text-anchor="end">180°</text>
+<line x1="250" y1="280" x2="285" y2="280" stroke="#888780" stroke-width="1.5"/>
+<rect x="40" y="230" width="210" height="100" rx="6" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+<text x="54" y="254" font-size="13" fill="#0C447C" font-weight="bold">Rear left</text>
+<text x="54" y="278" font-size="12" fill="#0C447C">ch 6</text>
+<text x="104" y="278" font-size="12" fill="#0C447C">shoulder</text>
+<text x="236" y="278" font-size="12" fill="#0C447C" text-anchor="end">90°</text>
+<text x="54" y="298" font-size="12" fill="#0C447C">ch 7</text>
+<text x="104" y="298" font-size="12" fill="#0C447C">upper leg</text>
+<text x="236" y="298" font-size="12" fill="#0C447C" text-anchor="end">120°</text>
+<text x="54" y="318" font-size="12" fill="#0C447C">ch 8</text>
+<text x="104" y="318" font-size="12" fill="#0C447C">wrist</text>
+<text x="236" y="318" font-size="12" fill="#0C447C" text-anchor="end">0°</text>
+<line x1="430" y1="280" x2="395" y2="280" stroke="#888780" stroke-width="1.5"/>
+<rect x="430" y="230" width="210" height="100" rx="6" fill="#FAC775" stroke="#854F0B" stroke-width="1"/>
+<text x="444" y="254" font-size="13" fill="#633806" font-weight="bold">Rear right</text>
+<text x="444" y="278" font-size="12" fill="#633806">ch 9</text>
+<text x="494" y="278" font-size="12" fill="#633806">shoulder</text>
+<text x="626" y="278" font-size="12" fill="#633806" text-anchor="end">90°</text>
+<text x="444" y="298" font-size="12" fill="#633806">ch 10</text>
+<text x="494" y="298" font-size="12" fill="#633806">upper leg</text>
+<text x="626" y="298" font-size="12" fill="#633806" text-anchor="end">60°</text>
+<text x="444" y="318" font-size="12" fill="#633806">ch 11</text>
+<text x="494" y="318" font-size="12" fill="#633806">wrist</text>
+<text x="626" y="318" font-size="12" fill="#633806" text-anchor="end">180°</text>
+<text x="340" y="362" font-size="12" fill="#888780" text-anchor="middle">seen from above, head at the top; each angle is where the servo is set before its horn goes on</text>
+<text x="340" y="380" font-size="12" fill="#888780" text-anchor="middle">(Arduino Servo scale: 0° = 544 µs, 90° = 1472 µs, 180° = 2400 µs)</text>
+</svg>

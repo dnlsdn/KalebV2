@@ -37,6 +37,11 @@ So the relay was taken out entirely:
 - The three Dupont on the relay's logic header were removed, VCC from the red bar and GND from the
   black bar, and the module left the bench.
 
+<img src="images/06-relay-bypass.svg" alt="Before: SZBK07 OUT+ through the relay's COM and NO to PCA9685 V+. After: SZBK07 OUT+ through a WAGO 221-412 to PCA9685 V+" width="560">
+
+*The servo rail before and after. Same two power wires, joined in a WAGO instead of through the
+relay's contacts.*
+
 ## Continuity checks before power
 
 | Check | Result |

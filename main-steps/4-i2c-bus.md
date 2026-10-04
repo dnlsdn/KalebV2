@@ -48,6 +48,11 @@ The ESP32 has a single 3V3 pin and two boards needed it, and SDA and SCL each ha
 boards from one GPIO. Three three-way junctions, so three WAGO connectors — the same approach
 already used to split the ACS712 output, rather than a new kind of component.
 
+<img src="images/04-i2c-bus.svg" alt="ESP32 3V3, GPIO21 and GPIO22 each go into a WAGO that splits them to the PCA9685 at 0x40 and the MPU6050 at 0x68" width="560">
+
+*The bus as wired: one WAGO per line, each feeding both boards. Grounds go to the black bus bar and
+are not drawn.*
+
 **WAGO 221 connectors are specified from 0.14mm² upward. Dupont wire is about 0.08mm².** It is
 below the minimum, and the lever does not reliably grip it.
 
@@ -109,4 +114,6 @@ Next session is the 6V servo rail and the relay: SZBK07 OUT+ to relay COM, relay
 the 1000µF capacitor, and the relay control wire to GPIO27 with its 10k pull-up. End state is a
 servo rail that can be switched on and off on command, with still no servo attached to it.
 
-<img width="1010" height="1238" alt="image" src="https://github.com/user-attachments/assets/48f90ad1-9960-4062-8b62-a6b322f4a53a" />
+<img src="images/04-i2c-bench.jpg" alt="The bench after the I2C session, with three WAGO connectors on the right and the multimeter beside them" width="420">
+
+*The bench after the session. The three WAGOs on the right are the 3V3, SDA and SCL junctions.*

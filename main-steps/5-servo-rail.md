@@ -116,6 +116,11 @@ are below the threshold, so **no state of the software can hold this relay open 
 straight to IN**. The pin was doing its job correctly; the module simply cannot be spoken to at this
 voltage.
 
+<img src="images/05-relay-threshold.svg" alt="Voltage scale from 0 to 5V: the relay is off only above about 4.2V; an ESP32 pin reaches 3.1V driven high and about 3.9V in high impedance, both below the threshold" width="560">
+
+*Where the relay switches, and where an ESP32 pin can go. Both pin states fall in the red zone, so
+the relay is always on.*
+
 The 2.0V measured on the node while the relay was closed is the red bus bar sagging: with the coil
 energised, the bar was being fed backwards through the ESP32's VIN pin from USB, which is a weak
 path.
