@@ -28,7 +28,8 @@ connected pack means live servos.**
 
 ## Power-down
 
-1. **Stop the servos** — no motion, no load — before cutting power.
+1. **Stop the servos** — no motion, no load — before cutting power. Leika's STOP button and Deactivated
+   mode are not a power-down: the servos stay stiff (session 15). Only the XT60 removes their power.
 2. **Unplug the XT60.** The rails decay to 0V over a few seconds as the capacitors discharge.
 3. **Fuse out** only if the next job touches the power path.
 
