@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="270" viewBox="0 0 680 270" font-family="Helvetica, Arial, sans-serif">
+<title>Uptime against the clock: the board never restarted in either test</title>
+<text x="183" y="58" font-size="13" fill="#185FA5" text-anchor="middle" font-weight="bold">Pack in, no servo moving</text>
+<text x="534" y="58" font-size="13" fill="#854F0B" text-anchor="middle" font-weight="bold">One leg: Active, three moves</text>
+<rect x="96" y="70" width="174" height="26" rx="4" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+<rect x="450" y="70" width="168" height="26" rx="4" fill="#FAC775" stroke="#854F0B" stroke-width="1"/>
+<line x1="270" y1="83" x2="450" y2="83" stroke="#888780" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="360" y="77" font-size="11" fill="#888780" text-anchor="middle">XT60 out, nine servos unplugged</text>
+<line x1="60" y1="120" x2="630" y2="120" stroke="#888780" stroke-width="1"/>
+<g font-size="11" fill="#888780" text-anchor="middle">
+<line x1="60" y1="116" x2="60" y2="124" stroke="#888780"/><text x="60" y="138">16:10</text>
+<line x1="171" y1="116" x2="171" y2="124" stroke="#888780"/><text x="171" y="138">16:15</text>
+<line x1="283" y1="116" x2="283" y2="124" stroke="#888780"/><text x="283" y="138">16:20</text>
+<line x1="394" y1="116" x2="394" y2="124" stroke="#888780"/><text x="394" y="138">16:25</text>
+<line x1="506" y1="116" x2="506" y2="124" stroke="#888780"/><text x="506" y="138">16:30</text>
+<line x1="617" y1="116" x2="617" y2="124" stroke="#888780"/><text x="617" y="138">16:35</text>
+</g>
+<g font-size="12" text-anchor="middle">
+<circle cx="127" cy="83" r="4" fill="#185FA5"/><text x="127" y="166" fill="#0C447C">16:13</text><text x="127" y="182" fill="#0C447C">81.6 s</text>
+<circle cx="261" cy="83" r="4" fill="#185FA5"/><text x="261" y="166" fill="#0C447C">16:19</text><text x="261" y="182" fill="#0C447C">457.4 s</text>
+<circle cx="484" cy="83" r="4" fill="#854F0B"/><text x="484" y="166" fill="#633806">16:29</text><text x="484" y="182" fill="#633806">89.2 s</text>
+<circle cx="618" cy="83" r="4" fill="#854F0B"/><text x="606" y="166" fill="#633806">16:35</text><text x="606" y="182" fill="#633806">465.6 s</text>
+</g>
+<text x="340" y="220" font-size="12" fill="#888780" text-anchor="middle">Real uptime at each screenshot. Both times it grew by about 376 s while the clock moved 6 minutes:</text>
+<text x="340" y="238" font-size="12" fill="#888780" text-anchor="middle">a restart would have sent it back to zero. Leika shows milliseconds as seconds,</text>
+<text x="340" y="256" font-size="12" fill="#888780" text-anchor="middle">so "5 days 7 h 3 min 2 s" is 457,382 ms, which is 457.4 s.</text>
+</svg>
