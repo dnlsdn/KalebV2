@@ -6,16 +6,17 @@ It is **not vendored here**. It lives next to this repo:
 - **Clone:** `~/Library/Developer/SpotMicroESP32-Leika`, with its `nanopb` submodule
   (`git clone --recurse-submodules`).
 - **Based on:** upstream `9ccb0ff`, 2026-08-19.
-- **Local branch:** `kalebv2`, three commits on top (`d071f83`, `fd7120f`, `b3ec8ae`). It is not pushed
-  anywhere, so the full diff is below: if the clone is lost or Leika is updated, reapply these eight
+- **Local branch:** `kalebv2`, four commits on top (`d071f83`, `fd7120f`, `b3ec8ae`, `15e97cb`). It is not pushed
+  anywhere, so the full diff is below: if the clone is lost or Leika is updated, reapply these thirteen
   changes by hand.
 
-## The eight changes, and why
+## The thirteen changes, and why
 
 The first three were made at the desk on 2026-09-21. The next three were forced by the first flash on
 2026-10-03: without them Leika does not boot on this board, and once it boots nobody can reach it. The
 last two came on 2026-10-04: a race on the I2C bus found in session 16, and the calibration written into
-the firmware after the board that held it was lost.
+the firmware after the board that held it was lost. The last five came on 2026-10-31 (session 19), from
+a serial log: the web server running out of sockets, a Restart that never worked, and core dumps.
 
 | File | Change | Why |
 |---|---|---|
@@ -27,6 +28,11 @@ the firmware after the board that held it was lost.
 | `esp32/src/wifi/wifi_idf.cpp` | `getMode()` returns the mode the class started | A Leika bug, not this hardware. Before the radio is started the Wi-Fi driver reports **AP**, its default; `APService` read that, believed the access point was up, and never started it. The class already records the real mode in `_mode`; returning it fixes the access point. |
 | `esp32/include/peripherals/i2c_bus.h` | a recursive mutex around every transaction | A Leika bug. The control task and the WebSocket handlers both use the bus, and `ensureDevice()` deletes and re-creates the one device handle whenever the address changes. Moving the Servo page's PWM slider raced the IMU reads: 21 *Wrong I2C status, cannot delete device* in 109 slider moves, 0 in 812 after. Session 16. |
 | `esp32/include/peripherals/servo_controller.h` | defaults: conversion 2.56 and the twelve measured Center PWMs | Leika keeps calibration in the board's filesystem, which went with the board lost in session 16. Leika falls back to these defaults whenever no servo settings file exists, so a new board or an erased filesystem starts calibrated. Direction and Center Angle are upstream's. |
+| `esp32/src/communication/webserver.cpp`, `config()` | `keep_alive_enable`, and a `close_fn` that forgets the client | A Leika bug. A client left the WebSocket list only on a clean close frame. A phone that drops off Wi-Fi sends none, so its socket stayed open and Leika kept sending to it ten times a second. Keep-alive closes dead peers, and `close_fn` removes the client whenever its socket closes. |
+| `esp32/sdkconfig.defaults.esp32dev` | `CONFIG_LWIP_MAX_SOCKETS=16` | lwIP had **10** sockets; the web server wants up to 7 plus 3 of its own, and the captive portal's DNS one more. The table filled before the server's LRU purge could free one, and every new connection failed with `error in accept (23)`: the robot stopped answering. |
+| `esp32/src/communication/webserver.cpp`, POST handler | an empty body is accepted | A Leika bug. The app's Restart posts no body and the server rejected it with `400 Invalid content length`, so Restart never restarted. |
+| `esp32/src/communication/webserver.cpp`, `sendOk()` | `nullptr` cast to `const uint8_t*` | A Leika bug, hidden by the one above. A bare `nullptr` picked the protobuf template overload, which encoded with a null descriptor: **panic** (`LoadProhibited` in `pb_common.c`) on every Restart, reset or sleep. |
+| `esp32/sdkconfig.defaults.esp32dev` | core dump to flash, ELF format | A panic prints its backtrace only on the serial port, which is never open on the pack. Now it is saved to the existing `coredump` partition and read later over USB. |
 
 ```diff
 --- a/esp32/features.ini
@@ -65,6 +71,86 @@ the firmware after the board that held it was lost.
 -    return WIFI_MODE_NULL;
 +    return _mode;
  }
+```
+
+The session 19 commit, `15e97cb`:
+
+```diff
+diff --git a/esp32/sdkconfig.defaults.esp32dev b/esp32/sdkconfig.defaults.esp32dev
+index c72433d..15c27c9 100644
+--- a/esp32/sdkconfig.defaults.esp32dev
++++ b/esp32/sdkconfig.defaults.esp32dev
+@@ -3,3 +3,12 @@
+ # to find the firmware aborts at boot and resets in a loop.
+ # CONFIG_SPIRAM is not set
+ CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
++
++# KalebV2: keep a crash's core dump in the "coredump" partition, to read over USB afterwards.
++# A panic otherwise prints its backtrace on the serial port only, which is never open on the pack.
++CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH=y
++CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF=y
++
++# KalebV2: the web server opens up to 7 sockets plus its own 3, and the DNS server one more:
++# with lwIP's 10 the table ran out before the server's LRU purge could free one.
++CONFIG_LWIP_MAX_SOCKETS=16
+diff --git a/esp32/src/communication/webserver.cpp b/esp32/src/communication/webserver.cpp
+index f5bd76b..5666f20 100644
+--- a/esp32/src/communication/webserver.cpp
++++ b/esp32/src/communication/webserver.cpp
+@@ -2,6 +2,7 @@
+ #include <esp_log.h>
+ #include <cstring>
+ #include <algorithm>
++#include <unistd.h>
+ 
+ static const char* TAG = "WebServer";
+ 
+@@ -23,6 +24,18 @@ void WebServer::config(size_t maxUriHandlers, size_t stackSize) {
+     config_.max_resp_headers = 16;
+     config_.lru_purge_enable = true;
+     config_.uri_match_fn = httpd_uri_match_wildcard;
++    // KalebV2: a phone that drops off Wi-Fi never sends a close frame, so its socket and its
++    // WebSocket entry stayed until the socket table ran out. Keep-alive finds dead peers, and
++    // close_fn forgets a client whenever its socket closes, for any reason.
++    config_.keep_alive_enable = true;
++    config_.global_user_ctx = this;
++    config_.global_user_ctx_free_fn = [](void*) {};
++    config_.close_fn = [](httpd_handle_t hd, int sockfd) {
++        WebServer* self = static_cast<WebServer*>(httpd_get_global_user_ctx(hd));
++        self->removeWsClient(sockfd);
++        if (self->wsCloseHandler_) self->wsCloseHandler_(sockfd);
++        close(sockfd);
++    };
+ }
+ 
+ esp_err_t WebServer::listen(uint16_t port) {
+@@ -75,12 +88,13 @@ esp_err_t WebServer::httpHandler(httpd_req_t* req) {
+             }
+             if (route.postHandler) {
+                 size_t contentLen = req->content_len;
+-                if (contentLen == 0 || contentLen > 4096) {
++                // KalebV2: an empty body is a valid empty request; the app's Restart sends one.
++                if (contentLen > 4096) {
+                     httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid content length");
+                     return ESP_FAIL;
+                 }
+ 
+-                uint8_t* buffer = (uint8_t*)malloc(contentLen);
++                uint8_t* buffer = (uint8_t*)malloc(contentLen ? contentLen : 1);
+                 if (!buffer) {
+                     httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Memory allocation failed");
+                     return ESP_FAIL;
+@@ -281,7 +295,9 @@ esp_err_t WebServer::sendError(httpd_req_t* req, int status, const char* message
+     return send(req, status, (uint8_t*)message, strlen(message));
+ }
+ 
+-esp_err_t WebServer::sendOk(httpd_req_t* req) { return send(req, 200, nullptr, 0); }
++// KalebV2: a bare nullptr picked the protobuf template overload, which then encoded with a null
++// message descriptor and panicked. Restart, reset and sleep all answer through here.
++esp_err_t WebServer::sendOk(httpd_req_t* req) { return send(req, 200, static_cast<const uint8_t*>(nullptr), 0); }
+ 
+ esp_err_t WebServer::send(httpd_req_t* req, int status, const uint8_t* data, size_t len) {
+     httpd_resp_set_status(req, status == 200   ? "200 OK"
 ```
 
 `sdkconfig.esp32dev`, in the project root, is generated from the defaults and git-ignored. It is only
@@ -171,3 +257,19 @@ app lives only on the board until it is copied here and into `servo_controller.h
 - **The IMU chart says degrees and plots radians.** The driver's `atan2` returns radians and the app
   does not convert them: ±3.14 is ±180°, and a line jumping from +3 to −3 is the angle wrapping
   around, not noise.
+
+## Reading a crash after the fact
+
+Since session 19 a panic is saved to the `coredump` partition (`0x3f0000`, 64KB) and the board says so at
+the next boot (`Found core dump ... in flash`). With the XT60 out and USB in, save it before anything
+else, because the next crash overwrites it:
+
+```bash
+~/.platformio/penv/bin/python ~/.platformio/packages/tool-esptoolpy/esptool.py --port /dev/cu.usbserial-0001 read_flash 0x3f0000 0x10000 coredump.bin
+```
+
+It decodes against the `firmware.elf` of the same build (`.pio/build/esp32dev/firmware.elf`) with the
+`esp-coredump` tool, which is not installed in PlatformIO's environment yet. A backtrace caught on the
+serial port decodes with `xtensa-esp32-elf-addr2line -pfiaC -e firmware.elf <addresses>`, from
+`~/.platformio/packages/toolchain-xtensa-esp-elf/bin/`. After reading, erase it
+(`esptool.py ... erase_region 0x3f0000 0x10000`) so the next one found is new.
