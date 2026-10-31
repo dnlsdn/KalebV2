@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-10-31, session 18 closed: twelve servos together and Rest work; a firmware crash is next.
+**Last updated:** 2026-10-31, session 19 closed: "stops answering" fixed, core dumps on; the electronics move next.
 
 ---
 
@@ -207,9 +207,18 @@ Stand works too. Choosing a mode activates the servos; the Servo page's Active i
 sends every leg straight down, where the right knees stop bent by the 125 clamp (front about 16°, rear
 about 42°).
 
-**The firmware crashes** — session 18: the board stopped answering commands, and after a pack reconnect
-System Status read *Software reset due to exception/panic*, within seconds of booting. Not the supply.
-The backtrace goes only to the serial port; core dumps are off in Leika's configuration.
+**The board no longer stops answering** — session 19. Cause, from a serial log: a phone that dropped off
+Wi-Fi stayed in Leika's client list with its socket open, and lwIP's 10 sockets ran out
+(`error in accept (23)`). Fixed in Leika with keep-alive, a `close_fn` and 16 sockets; the same test then
+gave 0 errors. The Restart button works now too, after two more Leika bugs (an empty request refused,
+then a panic in `sendOk()`).
+
+**Session 18's panic is still unexplained.** Not reproduced on USB. **Core dumps now go to flash**: if the
+board panics on the pack, the next boot says `Found core dump`, and it is read over USB before anything
+else (`firmware/leika-config.md`).
+
+**The IMU sometimes fails to start after a reset** — 2 of 8 boots in session 19, all warm resets, with
+`89 Hz` in the log. Leika carries on without it. Not yet known whether a cold power-on avoids it.
 
 **The brown-out did not come back** — session 17. Session 15 saw *Reset Reason: Brownout reset* with three
 servos moved one at a time. On the new board, in the same configuration (one leg, Active, three servos
@@ -222,9 +231,9 @@ together did not bring it back either (session 18).
 chip as the board lost in session 16. Same five Duponts, same pins. **The PCA9685 (0x40) and the IMU
 (0x68) survived** and answer on the I2C page.
 
-**Leika has eight changes now** — session 16 added a lock on the I2C bus (a real race: 21 errors in 109
+**Leika has thirteen changes now** — session 16 added a lock on the I2C bus (a real race: 21 errors in 109
 slider moves, 0 in 812 after) and wrote the calibration in as the firmware's defaults, so the new board
-starts calibrated.
+starts calibrated. Session 19 added five: the web server's dead clients and sockets, Restart, core dumps.
 
 **Deactivating does not relax the servos.** With Active off and the PCA9685 asleep, a leg stayed stiff.
 STOP and Deactivated are not a safe state; unplugging the XT60 is.
@@ -251,28 +260,27 @@ not by a document.
 
 ---
 
-## Next session — Session 19: the firmware crash
+## Next session — Session 20: the electronics onto the body
 
-**Is it worth doing?** Yes, and before anything else: a controller that stops answering or restarts
-mid-step drops the robot. It is also the cheapest next step, since nothing is wired or printed: the
-board on USB, the phone, the serial monitor. Moving the electronics onto the body waits, because the
-bench is where the Mac reaches the board.
+**Is it worth doing?** Yes: the robot cannot walk with its electronics on the bench, and it is the next
+item on the path (backlog 5). It also closes two open items for free: the IMU screwed flat on the plate
+(does it read level, and does it still fail to start once it stops hanging from its wires?), and the
+Duponts secured before anything vibrates.
 
-**What session 18 saw:** the board stopped answering commands; after the pack was reconnected it read
-*Software reset due to exception/panic*, within seconds of booting, possibly at the phone's first command.
-A panic prints its backtrace on the serial port and nowhere else.
+**Decide first: the PCA9685's traces (backlog 2).** Reinforcing its V+ and GND traces with solder needs
+the board off and unwired, which this session does anyway. If it is done, it is done first, as its own
+step, before anything is screwed down.
 
-- [ ] **XT60 out, USB in.** The servos stay plugged but unpowered: if the crash is in the firmware, it does
-      not need them.
-- [ ] Serial monitor open from the Mac, logging to a file, with PlatformIO's `esp32_exception_decoder`
-      filter so a backtrace comes out as file and line in Leika's source.
-- [ ] Phone on Spot-Micro, Safari on 192.168.4.1. Try what session 18 did: Rest, Stand, Rest; the Servo
-      page's Active on and off; Wi-Fi off and on again on the phone, then a mode at once.
-- [ ] If it crashes: the decoded backtrace into the log, then decide the fix (a ninth change to Leika, in
-      `firmware/leika-config.md`).
-- [ ] If it does not crash on USB: turn core dumps to flash on in Leika's configuration, so a crash on the
-      pack is kept and read afterwards over USB.
-- [ ] Write `main-steps/19-*.md`, update this file, one commit.
+- [ ] Pack out, fuse out, USB out, **0V between the bars**. Photograph the bench from above before
+      unwiring anything.
+- [ ] Plan the plate: where each module goes, the SZBK07 heatsinks touching nothing conductive, the
+      ESP32's USB port reachable for flashing and for reading a core dump.
+- [ ] Mount and rewire one module at a time. Then the same checks as session 17: 3.3V WAGO to the black
+      bar not a short, the two reds by resistance, continuity on SDA and SCL.
+- [ ] USB alone: I2C page shows 0x40 and 0x68, on a **cold** power-on and after a reset.
+- [ ] The IMU: does it read level now that it sits flat?
+- [ ] `docs/wiring/`: update the layout, rebuild, republish. Write `main-steps/20-*.md`, update this file,
+      one commit.
 
 ---
 
@@ -288,7 +296,7 @@ A panic prints its backtrace on the serial port and nowhere else.
 3. ~~**Leika: build and flash.**~~ Done in session 13, with six changes to upstream. Calibration: the
    servo frame (conversion) done in session 14, body frame in session 15. New ESP32 in session 17, and
    the brown-out did not return with one leg; twelve servos together and Rest done in session 18.
-   **The firmware crash first** (session 19).
+   The firmware crash hunt in session 19 fixed "stops answering" and turned core dumps on.
 4. **Mount the main switch** on battery +, between the XT60 and the fuse. Owned already. With no
    relay it is the only servo power control, so check its DC current rating first.
 5. **Electronics onto the body** — the circuitry plate, after the crash is found: bench debugging is
