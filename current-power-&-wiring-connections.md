@@ -94,20 +94,21 @@ Verified in session 6, no servo attached:
 
 ---
 
-## ESP32 — out of the robot since session 16
+## ESP32 — replaced in session 17
 
-The board was lost in session 16 (`main-steps/16-resets.md`) and removed. Its five Duponts, to put
-back on the replacement:
+The board was lost in session 16 (`main-steps/16-resets.md`). The replacement, an ESP-WROOM-32 with a
+CP2102 and 30 pins, went on in session 17 with the same five Duponts:
 
 | Wire | From | ESP32 pin |
 |---|---|---|
 | red | red bus bar, 5V | VIN (5V) |
 | red | 3.3V WAGO | 3V3 |
 | black | black bus bar | GND |
-| yellow | SDA WAGO | GPIO21 |
-| orange | SCL WAGO | GPIO22 |
+| yellow | SDA WAGO | D21 (GPIO21) |
+| orange | SCL WAGO | D22 (GPIO22) |
 
-The replacement is an ESP-WROOM-32 board with a CP2102 and 30 pins; its labels may read D21 and D22.
+Both reds were checked by resistance before power, unpowered: red bus bar to VIN and 3.3V WAGO to 3V3
+near 0 ohm. They are the only pair that can be swapped, and swapped they put 5V on the IMU.
 
 ---
 
