@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-10-31, session 17 closed: new ESP32 on the bench, no brown-out with one leg, twelve servos next.
+**Last updated:** 2026-10-31, session 18 closed: twelve servos together and Rest work; a firmware crash is next.
 
 ---
 
@@ -174,7 +174,6 @@ off.
 **All twelve servos are on their real channels** — session 12, checked with `code/channel_check`:
 none swapped, none buzzing, V+ 6.0V and the red bar 5.0V with all twelve holding. The robot sits on a
 box beside the bench; the electronics have not moved into it yet. The voltage sensor is not mounted at all.
-**Since session 17 only channels 0-2 are plugged**; the other nine go back at the start of session 18.
 
 **Firmware.** An I2C scanner in session 4, `relay_off_on_safe` in session 5, `servo_center` in
 session 7 (Adafruit PWM Servo Driver Library 3.0.3). That sketch
@@ -202,12 +201,22 @@ knee 90° and foot under the hip; values in `firmware/leika-config.md`. Nine of 
 Leika's default, up to 23°. Center Angle and Direction are Leika's defaults. No pose has been commanded
 through Leika's kinematics yet.
 
+**Rest works** — session 18, the first pose from Leika's kinematics, robot lifted: thighs nearly level
+towards the tail, knees folded, feet under the hips, the four legs symmetric, so the Directions are right.
+Stand works too. Choosing a mode activates the servos; the Servo page's Active is a calibration tool that
+sends every leg straight down, where the right knees stop bent by the 125 clamp (front about 16°, rear
+about 42°).
+
+**The firmware crashes** — session 18: the board stopped answering commands, and after a pack reconnect
+System Status read *Software reset due to exception/panic*, within seconds of booting. Not the supply.
+The backtrace goes only to the serial port; core dumps are off in Leika's configuration.
+
 **The brown-out did not come back** — session 17. Session 15 saw *Reset Reason: Brownout reset* with three
 servos moved one at a time. On the new board, in the same configuration (one leg, Active, three servos
 moved one at a time) and with six minutes idle on the pack, there was no restart: Reset Reason stayed
 power-on and the Uptime kept pace with the clock. Not reproduced is not explained: board, Duponts and
 firmware all changed since, and session 16 found a GND Dupont off the black bar. Twelve servos activated
-together is the test still to do.
+together did not bring it back either (session 18).
 
 **A new ESP32 is on the bench** — session 17, an ESP-WROOM-32 / CP2102, 30 pins, D0WD-V3 4MB, the same
 chip as the board lost in session 16. Same five Duponts, same pins. **The PCA9685 (0x40) and the IMU
@@ -242,30 +251,28 @@ not by a document.
 
 ---
 
-## Next session — Session 18: twelve servos under Leika
+## Next session — Session 19: the firmware crash
 
-**Is it worth doing?** Yes, it is the next step on the path to walking: no pose has ever been commanded
-through Leika's kinematics, and Rest is the first one. The brown-out check comes with it at no extra cost,
-because putting the twelve back and switching Active on is the biggest current step the robot makes.
-Not urgent before it: the PCA9685 trace reinforcement (backlog 2) matters when the robot carries its own
-weight, and lifted it does not.
+**Is it worth doing?** Yes, and before anything else: a controller that stops answering or restarts
+mid-step drops the robot. It is also the cheapest next step, since nothing is wired or printed: the
+board on USB, the phone, the serial monitor. Moving the electronics onto the body waits, because the
+bench is where the Mac reaches the board.
 
-**Bench state now:** only the front left leg is plugged (channels 0, 1, 2). Channels 3 to 11 came out in
-session 17.
+**What session 18 saw:** the board stopped answering commands; after the pack was reconnected it read
+*Software reset due to exception/panic*, within seconds of booting, possibly at the phone's first command.
+A panic prints its backtrace on the serial port and nowhere else.
 
-- [ ] XT60 out. Channels back: front right 3/4/5, rear left 6/7/8, rear right 9/10/11, each in the order
-      shoulder, upper leg, lower leg.
-- [ ] Robot lifted, all four legs free and clear of the wires.
-- [ ] XT60 in, Safari on 192.168.4.1 (not the captive Wi-Fi sheet, it drops the connection). System Status:
-      note Reset Reason and Uptime.
-- [ ] **Active on, all twelve at once**: every leg goes straight down. The right knees stop about 15° short
-      of straight (the 125 clamp, session 15). System Status again: still power-on, Uptime grown with the
-      clock?
-- [ ] If it holds: the **Rest** mode from the controller page, robot still lifted. Watch for a joint
-      going the wrong way: that is a Direction, not yet checked on this robot.
-- [ ] If the board resets: Reset Reason first, then black probe on the black bus bar, red on the ESP32's
-      VIN pin, while Active switches on.
-- [ ] Write `main-steps/18-*.md`, update this file, one commit.
+- [ ] **XT60 out, USB in.** The servos stay plugged but unpowered: if the crash is in the firmware, it does
+      not need them.
+- [ ] Serial monitor open from the Mac, logging to a file, with PlatformIO's `esp32_exception_decoder`
+      filter so a backtrace comes out as file and line in Leika's source.
+- [ ] Phone on Spot-Micro, Safari on 192.168.4.1. Try what session 18 did: Rest, Stand, Rest; the Servo
+      page's Active on and off; Wi-Fi off and on again on the phone, then a mode at once.
+- [ ] If it crashes: the decoded backtrace into the log, then decide the fix (a ninth change to Leika, in
+      `firmware/leika-config.md`).
+- [ ] If it does not crash on USB: turn core dumps to flash on in Leika's configuration, so a crash on the
+      pack is kept and read afterwards over USB.
+- [ ] Write `main-steps/19-*.md`, update this file, one commit.
 
 ---
 
@@ -280,11 +287,15 @@ session 17.
    AWG16 feeding them. Before the robot carries its own weight.
 3. ~~**Leika: build and flash.**~~ Done in session 13, with six changes to upstream. Calibration: the
    servo frame (conversion) done in session 14, body frame in session 15. New ESP32 in session 17, and
-   the brown-out did not return with one leg. **Twelve servos together, then Rest with the robot
-   lifted**: session 18.
+   the brown-out did not return with one leg; twelve servos together and Rest done in session 18.
+   **The firmware crash first** (session 19).
 4. **Mount the main switch** on battery +, between the XT60 and the fuse. Owned already. With no
    relay it is the only servo power control, so check its DC current rating first.
-5. **Legs onto the chassis, first steps.**
+5. **Electronics onto the body** — the circuitry plate, after the crash is found: bench debugging is
+   easier with the Mac next to it. One session of its own, re-verified like session 17 (3.3V short check,
+   the two reds, I2C scan). It also settles two open items: the IMU screwed flat (does it read level?)
+   and the Duponts secured before anything vibrates.
+6. **Legs onto the chassis, first steps.**
 
 **After it walks:** MPU6050 tuning, ACS712 output to GPIO34, voltage sensor, HC-SR04 with the
 dividers, ESP32-CAM, OLED.
