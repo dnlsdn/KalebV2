@@ -46,6 +46,8 @@ def pca9685(x, y):
         cy = y + 18 + i * 13
         s += header_pin(x + 10, cy) + text(x + 20, cy + 3, n, 7, anchor="start")
         pins[f"L_{n}"] = (x - 2, cy)
+        s += header_pin(x + w - 10, cy) + text(x + w - 20, cy + 3, n, 7, anchor="end")
+        pins[f"R_{n}"] = (x + w + 2, cy)
     for ch in range(16):
         cx = x + 24 + ch * 16 + (ch // 4) * 4
         for r, col in enumerate(("#1a1a1a", "#c62828", "#f5c518")):
@@ -53,7 +55,7 @@ def pca9685(x, y):
         s += text(cx, y + h - 36, str(ch), 6)
         pins[f"ch{ch}"] = (cx, y + h + 2)
     s += text(x + w - 6, y + h - 6, "GND · V+ · PWM", 6, anchor="end")
-    s += text(x + w - 8, y + 18, "PCA9685 · I2C 0x40", 9, anchor="end", weight=600)
+    s += text(x + w - 8, y - 6, "PCA9685 · I2C 0x40", 9, anchor="end", weight=600)
     return s, pins
 
 

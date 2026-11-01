@@ -11,12 +11,9 @@ PLACEMENT = {
     "hc2": (L.hcsr04, 180, 60, ("HC-SR04 #2",), "both"),
     "cam": (L.esp32cam, 340, 30, (), "final"),
     "esp": (L.esp32, 560, 60, (), "both"),
-    "w33": (P.wago, 900, 150, (5, "3V3 WAGO"), "both"),
-    "wsda": (P.wago, 1000, 150, (5, "SDA WAGO"), "both"),
-    "wscl": (P.wago, 1090, 150, (3, "SCL WAGO"), "both"),
     "mpu": (L.mpu6050, 1230, 40, (), "both"),
     "oled": (L.oled, 1370, 40, (), "final"),
-    "red": (P.bus_bar, 240, 250, ("red", "RED BUS BAR · 5V logic"), "both"),
+    "w5": (P.wago, 300, 280, (5, "WAGO D · 5V logic"), "both"),
     "bat": (P.lipo, 30, 440, (), "both"),
     "sw": (P.rocker_switch, 322, 465, (), "final"),
     "fuse": (P.blade_fuse, 400, 467, (), "both"),
@@ -27,8 +24,10 @@ PLACEMENT = {
     "sz": (P.szbk07, 660, 560, (), "both"),
     "wrail": (P.wago, 1010, 500, (2, "servo rail WAGO"), "both"),
     "pca": (L.pca9685, 1150, 460, (), "both"),
-    "gtap": (P.wago, 990, 952, (5, "future GND tap"), "final"),
-    "black": (P.bus_bar, 620, 950, ("black", "BLACK BUS BAR · ground star"), "both"),
+    "gA": (P.wago, 640, 960, (5, "WAGO A · GND, power"), "both"),
+    "gB": (P.wago, 790, 960, (5, "WAGO B · GND"), "both"),
+    "gC": (P.wago, 940, 960, (5, "WAGO C · GND, logic"), "both"),
+    "gtap": (P.wago, 1090, 960, (5, "future GND tap"), "final"),
 }
 
 # Servos: michaelkubina's channel map. Lower-leg servos get a 10-15cm extension.
