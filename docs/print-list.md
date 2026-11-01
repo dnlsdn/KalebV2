@@ -8,7 +8,7 @@ Quantities and infill are his; the order and the notes are this build's.
 and from group 1 the Inner Shoulder, Chassis Side, Top Shoulder and Bottom Shoulder, two of each
 (2026-09-20).
 
-**Still to print:** the three LiPo brackets, the stand, then group 2. The circuitry mounting plate
+**Still to print:** the three LiPo brackets (on the printer since 2026-10-31), the stand, then group 2. The circuitry mounting plate
 is printed and in the chassis (2026-09-21).
 
 **Material.** PLA for everything structural, as in the reference build. The foot tips are the only

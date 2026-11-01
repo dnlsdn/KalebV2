@@ -147,7 +147,7 @@ def render(view):
     part_svg.append(f'<path d="M1054 517H1100V392H1152" fill="none" stroke="#7f8f99" stroke-width="1" stroke-dasharray="2 3"/>'
                     + text(1156, 388, rl[0], 9, anchor="start", cls="lbl") + text(1156, 400, rl[1], 8, anchor="start", fill="#8fa0ab"))
     stub_out, stmeta = stubs(view, pins)
-    title = "KalebV2 wiring · bench today (session 5)" if view == "current" else "KalebV2 wiring · target, robot complete"
+    title = "KalebV2 wiring · bench today (session 20)" if view == "current" else "KalebV2 wiring · target, robot complete"
     grid = (f'<pattern id="g-{view}" width="20" height="20" patternUnits="userSpaceOnUse">'
             f'<path d="M20 0H0V20" fill="none" stroke="#1c2a28" stroke-width="1"/></pattern>')
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {layout.W} {layout.H}" class="wiring" data-view="{view}" '

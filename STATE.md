@@ -6,7 +6,7 @@ Read this file first when resuming after a break. Update it at the end of every 
 same commit as that session's log in `main-steps/`. If the two disagree, trust the session logs for
 what happened and correct this file.
 
-**Last updated:** 2026-10-31, session 19 closed: "stops answering" fixed, core dumps on; the electronics move next.
+**Last updated:** 2026-11-01, session 20 closed: bus bars replaced by WAGOs on the bench; the move onto the plate next.
 
 ---
 
@@ -115,20 +115,28 @@ so the replacements are identical to the ten already on the legs: two for the ro
 **They arrived on 2026-08-27** and both went into the legs as shoulder servos in session 8, at 90°,
 together with the two good originals.
 
-**Electronics.** The old wiring was scrapped on 2026-04-12 and rebuilt around two bus bars: black
-for the ground star, red for the 5V logic rail. Every connection below was measured on 2026-07-31,
-not remembered. The pin by pin map is in `current-power-&-wiring-connections.md`.
+**Electronics.** The old wiring was scrapped on 2026-04-12 and rebuilt around two bus bars. **Session 20
+took the bars out** (each 150 × 28mm, and the plate's mounting area is 106 × 150mm): the ground star is
+now three WAGO 221-415 in a chain (A takes every heavy ground: battery, SZBK07 IN−, PCA9685 GND), the 5V
+node is a fourth (D), and 3.3V and I2C pass through the PCA9685's two headers, which are joined pin for
+pin on the board. Electrically the same circuit. The pin by pin map is in
+`current-power-&-wiring-connections.md` and `docs/wiring/wires.py`.
+
+**Neither step-down has an OUT− wire** — found in session 20, while the documentation since July said both
+were on the bar, "verified". Both modules share ground between input and output, so the return currents
+come back through IN−; it has always worked this way. Wiring OUT− to WAGO A (one free port) is the textbook
+way, kept for later as one change on its own.
 
 - LiPo 2S negative to the black bus bar; positive through a 10A fuse into the ACS712. 7.55V after
   the fuse, the same as the pack, so the fuse conducts and drops nothing.
 - ACS712 output split to both step-downs. The 5V rail reads 4.98V with the logic drawing current,
   the 6V rail reads 6.00V with nothing drawing from it.
-- Red bus bar feeds ESP32 VIN, ACS712 VCC and both HC-SR04 VCC. All grounds are on the
-  black bus bar. No short between the two bars.
+- WAGO D (5V) feeds ESP32 VIN, ACS712 VCC and both HC-SR04 VCC: 4.95V with the pack in, session 20.
+  All grounds are in WAGOs A, B and C. No short between the 5V, 3.3V or 6V nodes and ground.
 - AWG14 for the power path, Dupont for logic.
 - **The SZBK07 heatsink bars sit at battery potential.** They are tied to the positive input and
   isolated from ground.
-- **The red bus bar is live at 4.93V whenever the ESP32 is on USB**, battery or no battery: USB
+- **The 5V node is live at about 4.9V whenever the ESP32 is on USB**, battery or no battery: USB
   power back-feeds out of the VIN pin onto the bar. Measured in session 4. "Battery disconnected"
   does not mean "nothing is powered".
 
@@ -168,8 +176,8 @@ then balance lead, then USB-C. The charger came set to 4S: check the cell count 
 **USB and the pack never go in together** — Espressif's DevKitC guide, found in session 7. Flash on
 USB with the XT60 unplugged, then unplug USB before connecting the pack.
 
-**Bus bars.** Seven free positions on the red bar, two on the black bar since the relay's wires came
-off.
+**Free ports.** One on WAGO A, one on WAGO B, none on C or D, and one spare 221-415 unused. The two bus
+bars are off the bench and kept.
 
 **All twelve servos are on their real channels** — session 12, checked with `code/channel_check`:
 none swapped, none buzzing, V+ 6.0V and the red bar 5.0V with all twelve holding. The robot sits on a
@@ -260,26 +268,28 @@ not by a document.
 
 ---
 
-## Next session — Session 20: the electronics onto the body
+## Next session — Session 21: the electronics onto the body
 
-**Is it worth doing?** Yes: the robot cannot walk with its electronics on the bench, and it is the next
-item on the path (backlog 5). It also closes two open items for free: the IMU screwed flat on the plate
-(does it read level, and does it still fail to start once it stops hanging from its wires?), and the
+**Is it worth doing?** Yes: the robot cannot walk with its electronics on the bench, and session 20 removed
+the obstacle, the bus bars. What goes on the plate now is what michaelkubina's plate was made for, plus
+four small WAGOs. It also settles two open items: the IMU screwed flat (does it read level?) and the
 Duponts secured before anything vibrates.
 
 **Decide first: the PCA9685's traces (backlog 2).** Reinforcing its V+ and GND traces with solder needs
 the board off and unwired, which this session does anyway. If it is done, it is done first, as its own
 step, before anything is screwed down.
 
-- [ ] Pack out, fuse out, USB out, **0V between the bars**. Photograph the bench from above before
-      unwiring anything.
-- [ ] Plan the plate: where each module goes, the SZBK07 heatsinks touching nothing conductive, the
-      ESP32's USB port reachable for flashing and for reading a core dump.
-- [ ] Mount and rewire one module at a time. Then the same checks as session 17: 3.3V WAGO to the black
-      bar not a short, the two reds by resistance, continuity on SDA and SCL.
-- [ ] USB alone: I2C page shows 0x40 and 0x68, on a **cold** power-on and after a reset.
+- [ ] Pack out, fuse out, USB out, **0V between a ground WAGO and WAGO D**. Photograph the bench first.
+- [ ] **The LiPo brackets first** (printed on 2026-11-01). The pack's place in the body decides where the
+      XT60 lands, so the length of every power wire.
+- [ ] Plan the plate: the template's standoffs for SZBK07, LM2596, ESP32 and PCA9685, the WAGOs and the
+      fuse holder in the space left, the SZBK07 heatsinks touching nothing conductive, the ESP32's USB port
+      reachable for flashing and for reading a core dump.
+- [ ] Move one module at a time; each wire that comes out of a WAGO goes back stripped 11mm and tug-tested.
+- [ ] The same checks as session 20, unpowered: the WAGO links, ESP32 GND and VIN, and no short on 5V,
+      3.3V and 6V. Then USB alone from cold: 0x40 and 0x68. Then the pack: 5V and 6V, Rest.
 - [ ] The IMU: does it read level now that it sits flat?
-- [ ] `docs/wiring/`: update the layout, rebuild, republish. Write `main-steps/20-*.md`, update this file,
+- [ ] `docs/wiring/`: update the layout, rebuild, republish. Write `main-steps/21-*.md`, update this file,
       one commit.
 
 ---
@@ -299,11 +309,12 @@ step, before anything is screwed down.
    The firmware crash hunt in session 19 fixed "stops answering" and turned core dumps on.
 4. **Mount the main switch** on battery +, between the XT60 and the fuse. Owned already. With no
    relay it is the only servo power control, so check its DC current rating first.
-5. **Electronics onto the body** — the circuitry plate, after the crash is found: bench debugging is
-   easier with the Mac next to it. One session of its own, re-verified like session 17 (3.3V short check,
+5. **Electronics onto the body** — the circuitry plate. The bus bars were replaced on the bench first, in
+   session 20, because they did not fit; the move itself is session 21. One session of its own, re-verified like session 17 (3.3V short check,
    the two reds, I2C scan). It also settles two open items: the IMU screwed flat (does it read level?)
    and the Duponts secured before anything vibrates.
-6. **Legs onto the chassis, first steps.**
+6. **Wire the two step-downs' OUT− to WAGO A.** Not needed to work, found missing in session 20.
+7. **Legs onto the chassis, first steps.**
 
 **After it walks:** MPU6050 tuning, ACS712 output to GPIO34, voltage sensor, HC-SR04 with the
 dividers, ESP32-CAM, OLED.
